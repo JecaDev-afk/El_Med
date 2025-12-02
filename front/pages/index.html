@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Document</title>
+</head>
+<body>
+    
+
+<button id="openModalBtn">Вхід / Реєстрація</button>
+
+<div id="authModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Реєстрація</h2>
+        <form id="registrationForm">
+            <div>
+                <label for="reg-username">Ім'я користувача:</label>
+                <input type="text" id="reg-username" name="username" required>
+            </div>
+            <div>
+                <label for="reg-email">Email:</label>
+                <input type="email" id="reg-email" name="email" required>
+            </div>
+            <div>
+                <label for="reg-password">Пароль:</label>
+                <input type="password" id="reg-password" name="password" required>
+            </div>
+            <button type="submit">Зареєструватися</button>
+            <p id="registrationMessage" class="message"></p>
+        </form>
+
+        <p style="margin-top: 20px;">
+            Вже є акаунт? <a href="#" id="showLogin">Увійти</a>
+        </p>
+    </div>
+</div>
+
+<script src="/js/script.js"></script> 
+</body>
+</html>
