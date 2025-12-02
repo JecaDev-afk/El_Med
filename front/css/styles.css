@@ -1,9 +1,55 @@
-/* front/css/styles.css */
+/* Базовий скидання та загальні стилі */
+:root {
+    --primary-color: #10B981;
+    /* Смарагдово-зелений */
+    --secondary-color: #1F2937;
+    /* Темно-сірий */
+    --light-bg: #F9FAFB;
+    --modal-bg: #FFFFFF;
+    --border-color: #E5E7EB;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
 
-/* Стилі для модального вікна */
-.modal {
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--light-bg);
+    color: var(--secondary-color);
+}
+
+/* Стилі для кнопки відкриття */
+#openAuthModal {
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--modal-bg);
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px var(--shadow-color);
+    transition: background-color 0.3s;
+    margin: 20px;
+}
+
+#openAuthModal:hover {
+    background-color: #059669;
+    /* Темніший зелений */
+}
+
+
+/* ==================================== */
+/* 3. Стилі Модального Вікна */
+/* ==================================== */
+
+.modal-backdrop {
+    /* Робить вікно повністю непрозорим */
     display: none;
-    /* Приховано за замовчуванням */
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -12,51 +58,144 @@
     height: 100%;
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.4);
-    /* Напівпрозорий фон */
+    /* Напівпрозорий чорний фон */
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
 }
 
 .modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    /* 15% зверху і по центру */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    /* Можна налаштувати ширину */
+    background-color: var(--modal-bg);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
+    width: 100%;
     max-width: 400px;
-    border-radius: 8px;
     position: relative;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .close-btn {
-    color: #aaa;
+    color: #9CA3AF;
+    /* Світло-сірий */
     float: right;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
+    line-height: 1;
+    position: absolute;
+    top: 10px;
+    right: 15px;
 }
 
 .close-btn:hover,
 .close-btn:focus {
-    color: black;
+    color: var(--secondary-color);
     text-decoration: none;
     cursor: pointer;
 }
 
-/* Стилі для повідомлень */
-.message {
+#modalTitle {
+    color: var(--secondary-color);
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+/* Стилі форм */
+form label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"] {
+    width: 100%;
     padding: 10px;
-    margin-top: 10px;
-    border-radius: 4px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+form input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+form button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+}
+
+form button[type="submit"]:hover {
+    background-color: #059669;
+}
+
+form p {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 14px;
+}
+
+form a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+form a:hover {
+    text-decoration: underline;
+}
+
+/* Контейнери для повідомлень */
+#messageContainer {
+    font-size: 14px;
+    border-radius: 6px;
+    padding: 10px;
     text-align: center;
 }
 
-.message.success {
-    background-color: #d4edda;
-    color: #155724;
+/* Спеціальні стилі для messageContainer, які встановлюються у JS */
+.text-red-700 {
+    color: #B91C1C;
 }
 
-.message.error {
-    background-color: #f8d7da;
-    color: #721c24;
+.bg-red-100 {
+    background-color: #FEE2E2;
+}
+
+.text-green-700 {
+    color: #065F46;
+}
+
+.bg-green-100 {
+    background-color: #D1FAE5;
 }
