@@ -8,6 +8,7 @@
     --modal-bg: #FFFFFF;
     --border-color: #E5E7EB;
     --shadow-color: rgba(0, 0, 0, 0.1);
+    --header-bg: #f1f1f1;
 }
 
 * {
@@ -20,6 +21,27 @@ body {
     font-family: 'Inter', sans-serif;
     background-color: var(--light-bg);
     color: var(--secondary-color);
+}
+
+/* header styles */
+header {
+    background-color: var(--header-bg);
+    padding: 20px 40px;
+    box-shadow: 0 2px 4px -1px var(--shadow-color);
+}
+nav img {
+    height: 150px;
+    border-radius: 50%;
+    box-shadow: 0 8px 9px -1px var(--shadow-color);
+    transition: box-shadow 0.3s;
+    
+}
+nav img:hover {
+    
+    box-shadow: 0 15px 23px -1px var(--shadow-color);
+    transform: scale(1.05);
+    will-change: transform;
+    transition: transform 0.25s ease, box-shadow 0.3s;
 }
 
 /* Стилі для кнопки відкриття */

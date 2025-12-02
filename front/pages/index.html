@@ -1,66 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-Med</title>
     <link rel="stylesheet" href="/css/styles.css" />
-</head>
-<body>
-  <!-- Кнопка для відкриття модального вікна -->
-  <button id="openAuthModal">Вхід / Реєстрація</button>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/" class="logo">
+            <img src="/images/logo.jpg" alt="Логотип E-Med">
+        </a>
+        <ul>
+            <li> <a href="/about.html">Про нас</a> </li>
+            <li> <a href="/author.html">Про автора</a> </li>
+        </ul>
+      </nav>
+    </header>
+    <main></main>
+    <footer></footer>
 
-  <!-- ============================================== -->
-  <!-- МОДАЛЬНЕ ВІКНО АУТЕНТИФІКАЦІЇ -->
-  <!-- Обов'язкові ID: authModal, closeModal, modalTitle -->
-  <!-- ============================================== -->
-  <div id="authModal" class="modal-backdrop">
-    <div class="modal-content">
-      <span class="close-btn" id="closeModal">&times;</span>
-      <h2 id="modalTitle">Реєстрація</h2>
+    <!-- Кнопка для відкриття модального вікна -->
+    <button id="openAuthModal">Вхід / Реєстрація</button>
 
-      <!-- Контейнер для повідомлень (успіх/помилка) -->
-      <div id="messageContainer" style="display: none"></div>
+    <!-- ============================================== -->
+    <!-- МОДАЛЬНЕ ВІКНО АУТЕНТИФІКАЦІЇ -->
+    <!-- Обов'язкові ID: authModal, closeModal, modalTitle -->
+    <!-- ============================================== -->
+    <div id="authModal" class="modal-backdrop">
+      <div class="modal-content">
+        <span class="close-btn" id="closeModal">&times;</span>
+        <h2 id="modalTitle">Реєстрація</h2>
 
-      <!-- ФОРМА РЕЄСТРАЦІЇ -->
-      <!-- Обов'язкові ID: registerForm, showLogin -->
-      <form id="registerForm">
-        <label for="reg_username">Ім'я користувача:</label>
-        <input type="text" id="reg_username" name="username" required />
+        <!-- Контейнер для повідомлень (успіх/помилка) -->
+        <div id="messageContainer" style="display: none"></div>
 
-        <label for="reg_email">Email:</label>
-        <input type="email" id="reg_email" name="email" required />
+        <!-- ФОРМА РЕЄСТРАЦІЇ -->
+        <!-- Обов'язкові ID: registerForm, showLogin -->
+        <form id="registerForm">
+          <label for="reg_username">Ім'я користувача:</label>
+          <input type="text" id="reg_username" name="username" required />
 
-        <label for="reg_password">Пароль:</label>
-        <input type="password" id="reg_password" name="password" required />
+          <label for="reg_email">Email:</label>
+          <input type="email" id="reg_email" name="email" required />
 
-        <button type="submit">Зареєструватися</button>
+          <label for="reg_password">Пароль:</label>
+          <input type="password" id="reg_password" name="password" required />
 
-        <p>
-          Вже є акаунт? <a href="#" id="showLogin"><u>Увійти</u></a>
-        </p>
-      </form>
+          <button type="submit">Зареєструватися</button>
 
-      <!-- ФОРМА ВХОДУ -->
-      <!-- Обов'язкові ID: loginForm, showRegister -->
-      <form id="loginForm" style="display: none">
-        <label for="log_email">Email:</label>
-        <input type="email" id="log_email" name="email" required />
+          <p>
+            Вже є акаунт? <a href="#" id="showLogin"><u>Увійти</u></a>
+          </p>
+        </form>
 
-        <label for="log_password">Пароль:</label>
-        <input type="password" id="log_password" name="password" required />
+        <!-- ФОРМА ВХОДУ -->
+        <!-- Обов'язкові ID: loginForm, showRegister -->
+        <form id="loginForm" style="display: none">
+          <label for="log_email">Email:</label>
+          <input type="email" id="log_email" name="email" required />
 
-        <button type="submit">Увійти</button>
+          <label for="log_password">Пароль:</label>
+          <input type="password" id="log_password" name="password" required />
 
-        <p>
-          Немає акаунту?
-          <a href="#" id="showRegister"><u>Зареєструватися</u></a>
-        </p>
-      </form>
+          <button type="submit">Увійти</button>
+
+          <p>
+            Немає акаунту?
+            <a href="#" id="showRegister"><u>Зареєструватися</u></a>
+          </p>
+        </form>
+      </div>
     </div>
-  </div>
 
-  <!-- ... в кінці <body> ... -->
-  <script src="/js/script.js"></script>
-</body>
+    <!-- ... в кінці <body> ... -->
+    <script src="/js/script.js"></script>
+  </body>
 </html>
