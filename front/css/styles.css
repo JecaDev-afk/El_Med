@@ -229,11 +229,11 @@ footer .footer-contacts p {
   padding: 60PX;
   border-radius: 10px;
 }
-.section table td,
+/* .section table td,
 thead,
 th {
-  /* background: rgba(183, 240, 217, 0.6); */
-}
+ background: rgba(183, 240, 217, 0.6); 
+} */
 section table td,
 th {
   text-align: center;
