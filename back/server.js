@@ -3,7 +3,7 @@ const express = require("express");
 const { Pool } = require("pg");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const path = require("path"); // Цей модуль допомагає працювати зі шляхами
+const path = require("path");
 
 const app = express();
 const port = 3000;
@@ -20,22 +20,20 @@ const pool = new Pool({
 app.use(cors());
 app.use(bodyParser.json());
 
-// --- ВИПРАВЛЕНА ЧАСТИНА ---
+// --- ОБСЛУГОВУВАННЯ СТАТИЧНИХ ФАЙЛІВ ---
 
-// 1. Вказуємо шлях до папки front (виходимо з 'back' на рівень вгору і йдемо в 'front')
 const frontPath = path.join(__dirname, "../front");
-
-// 2. Дозволяємо серверу брати файли (CSS, JS, картинки) з папки front
 app.use(express.static(frontPath));
 
-// 3. Головна сторінка (оскільки index.html у вас лежить глибоко в pages)
 app.get("/", (req, res) => {
   res.sendFile(path.join(frontPath, "pages", "index.html"));
 });
 
-// ---------------------------
+// ------------------------------------
+// --- МАРШРУТИ АВТЕНТИФІКАЦІЇ ---
+// ------------------------------------
 
-// Маршрут: РЕЄСТРАЦІЯ
+// Маршрут: РЕЄСТРАЦІЯ (повертає user_id)
 app.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
   try {
@@ -51,14 +49,18 @@ app.post("/register", async (req, res) => {
       "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email",
       [username, email, password]
     );
-    res.json({ message: "Реєстрація успішна!", user: newUser.rows[0] });
+    const user = newUser.rows[0];
+    res.json({
+      message: "Реєстрація успішна!",
+      user: { ...user, user_id: user.id },
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Помилка сервера" });
   }
 });
 
-// Маршрут: ВХІД
+// Маршрут: ВХІД (повертає user_id)
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -68,13 +70,18 @@ app.post("/login", async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(400).json({ message: "Користувача не знайдено" });
     }
-    const user = result.rows[0];
+    const user = result.rows[0]; // У реальному проекті тут має бути перевірка хешованого пароля, наприклад, за допомогою bcrypt
     if (user.password !== password) {
       return res.status(401).json({ message: "Невірний пароль" });
     }
     res.json({
       message: "Вхід успішний!",
-      user: { id: user.id, username: user.username, email: user.email },
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        user_id: user.id,
+      },
     });
   } catch (err) {
     console.error(err);
@@ -82,6 +89,91 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// ------------------------------------
+// --- МАРШРУТИ API ---
+// ------------------------------------
+
+// МАРШРУТ 1: ОТРИМАННЯ СПИСКУ ЛІКАРІВ
+app.get("/api/doctors", async (req, res) => {
+  try {
+    const doctors = await pool.query(
+      "SELECT id, name, specialty FROM doctors ORDER BY name"
+    );
+    res.json(doctors.rows);
+  } catch (err) {
+    console.error("Помилка при отриманні списку лікарів:", err);
+    res.status(500).json({ message: "Помилка сервера при отриманні лікарів" });
+  }
+});
+
+// МАРШРУТ 2: ЗАПИС НА ПРИЙОМ (Повинна виправити помилку 400)
+app.post("/api/appointments", async (req, res) => {
+  const { user_id, doctor_id, appointment_date, appointment_time, reason } =
+    req.body;
+
+  if (!user_id || !doctor_id || !appointment_date || !appointment_time) {
+    return res.status(400).json({
+      message: "Будь ласка, заповніть усі необхідні поля (лікар, дата, час).",
+    });
+  }
+
+  try {
+    const appointmentTimestamp = `${appointment_date} ${appointment_time}`;
+
+    const newAppointment = await pool.query(
+      `INSERT INTO appointments (user_id, doctor_id, appointment_date, reason) 
+             VALUES ($1, $2, $3, $4) RETURNING *`,
+      [user_id, doctor_id, appointmentTimestamp, reason]
+    );
+
+    res.json({
+      message: "Запис успішно створено!",
+      appointment: newAppointment.rows[0],
+    });
+  } catch (err) {
+    console.error("Помилка при створенні запису:", err);
+    if (err.code === "23503") {
+      return res.status(400).json({
+        message: "Помилка: неіснуючий лікар або недійсний користувач.",
+      });
+    }
+    res.status(500).json({ message: "Помилка сервера при записі на прийом." });
+  }
+});
+
+// МАРШРУТ 3: ОТРИМАННЯ ЗАПИСІВ КОРИСТУВАЧА (Повинна виправити помилку 404)
+app.get("/api/user/appointments", async (req, res) => {
+  const { user_id } = req.query;
+
+  if (!user_id) {
+    return res
+      .status(400)
+      .json({ message: "Необхідно вказати ID користувача." });
+  }
+
+  try {
+    const appointments = await pool.query(
+      `SELECT 
+                a.id, 
+                a.appointment_date, 
+                a.reason,
+                d.name AS doctor_name, 
+                d.specialty
+             FROM appointments a
+             JOIN doctors d ON a.doctor_id = d.id
+             WHERE a.user_id = $1
+             ORDER BY a.appointment_date DESC`,
+      [user_id]
+    );
+
+    res.json(appointments.rows);
+  } catch (err) {
+    console.error("Помилка при отриманні записів користувача:", err);
+    res.status(500).json({ message: "Помилка сервера при отриманні записів." });
+  }
+});
+
+// --- ЗАПУСК СЕРВЕРА: ПОВИНЕН БУТИ ОСТАННІМ ---
 app.listen(port, () => {
   console.log(`Сервер працює на http://localhost:${port}`);
 });

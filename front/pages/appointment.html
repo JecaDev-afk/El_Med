@@ -1,47 +1,131 @@
 <!DOCTYPE html>
 <html lang="uk">
+   
   <head>
+       
     <meta charset="UTF-8" />
+       
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>E-Med Main page</title>
+       
+    <title>E-Med Appointments</title>
+       
     <link rel="stylesheet" href="/css/styles.css" />
+       
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
       rel="stylesheet"
     />
+       
     <link
       rel="icon"
       href="/images/favicon_с_фоном_-removebg-preview.png"
       type="image/x-icon"
     />
+       
     <link
       rel="shortcut icon"
       href="/images/favicon_с_фоном_-removebg-preview.png"
       type="image/x-icon"
     />
+     
   </head>
+   
   <body>
+       
     <header>
+           
       <nav>
+               
         <a href="/" class="logo">
-          <img src="/images/logo.jpg" alt="Логотип E-Med" />
+                    <img src="/images/logo.jpg" alt="Логотип E-Med" />          
           <p>E-Medicine</p>
+                 
         </a>
+               
         <ul>
-          <li><a href="/">Головна <span class="emoji">🏠</span></a></li>
-          <li><a href="/pages/about.html">Про нас </a><span class="emoji">🤔</span></li>
-          <li><a href="/pages/author.html">Про автора </a><span class="emoji">👨‍💻</span></li>
+                   
           <li>
-            <a href="/pages/user_cabinet.html" id="userCabinetLink">Кабінет користувача </a><span class="emoji">🧑‍⚕️</span>
+            <a href="/">Головна <span class="emoji">🏠</span></a>
           </li>
+                   
           <li>
+            <a href="/pages/about.html">Про нас </a
+            ><span class="emoji">🤔</span>
+          </li>
+                   
+          <li>
+            <a href="/pages/author.html">Про автора </a
+            ><span class="emoji">👨‍💻</span>
+          </li>
+                   
+          <li>
+                       
+            <a href="/pages/user_cabinet.html" id="userCabinetLink"
+              >Кабінет користувача </a
+            ><span class="emoji">🧑‍⚕️</span>          
+          </li>
+                   
+          <li>
+                       
             <div id="authLinks">
-              <button id="openAuthModal">Увійти / Реєстрація 📝</button>
+                           
+              <button id="openAuthModal">Увійти / Реєстрація 📝</button>        
+                 
             </div>
+                     
           </li>
+                 
         </ul>
+             
       </nav>
+         
     </header>
+
+    <main class="appointment-container">
+      <h2>Запис на прийом 📅</h2>
+      <div
+        id="appointmentMessage"
+        class="message-box"
+        style="display: none"
+      ></div>
+
+      <form id="appointmentForm" class="appointment-form">
+        <input type="hidden" id="appointment_user_id" name="user_id" />
+
+        <label for="doctor_id">Виберіть лікаря:</label>
+        <select id="doctor_id" name="doctor_id" required>
+          <option value="" disabled selected>---</option>
+          <option value="1">Доктор Сміт (Кардіолог)</option>
+          <option value="2">Доктор Джонсон (Терапевт)</option>
+          <option value="3">Доктор Іваненко (Хірург)</option>
+        </select>
+
+        <label for="appointment_date">Дата прийому:</label>
+        <input
+          type="date"
+          id="appointment_date"
+          name="appointment_date"
+          required
+          min="<%= new Date().toISOString().split('T')[0] %>"
+        />
+
+        <label for="appointment_time">Час прийому:</label>
+        <input
+          type="time"
+          id="appointment_time"
+          name="appointment_time"
+          required
+        />
+
+        <label for="reason">Причина візиту (необов'язково):</label>
+        <textarea id="reason" name="reason" rows="4"></textarea>
+
+        <button type="submit">Записатися</button>
+      </form>
+    </main>
+
+       
     <script src="/js/script.js" type="module"></script>
+     
   </body>
 </html>
