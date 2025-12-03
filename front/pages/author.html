@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-Med Main page</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      href="/images/favicon_с_фоном_-removebg-preview.png"
+      type="image/x-icon"
+    />
+    <link
+      rel="shortcut icon"
+      href="/images/favicon_с_фоном_-removebg-preview.png"
+      type="image/x-icon"
+    />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/" class="logo">
+          <img src="/images/logo.jpg" alt="Логотип E-Med" />
+          <p>E-Medicine</p>
+        </a>
+        <ul>
+          <li><a href="/" >Головна <span class="emoji">🏠</span></a></li>
+          <li><a href="/pages/about.html">Про нас </a><span class="emoji">🤔</span></li>
+          <li><a href="/pages/author.html" class="active-link">Про автора </a><span class="emoji">👨‍💻</span></a></li>
+          <li>
+            <a href="/pages/user_cabinet.html" id="userCabinetLink">Кабінет користувача  <span class="emoji">🧑‍⚕️</span> </a>
+          </li>
+          <li>
+            <div id="authLinks">
+              <button id="openAuthModal">Увійти / Реєстрація 📝</button>
+            </div>
+          </li>
+          <li>
+            <div id="userMenu" style="display: none">
+              <span id="userNameDisplay">Привіт, гість!</span>
+              <button id="logoutBtn">Вийти</button>
+            </div>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+
+
+    <!-- Auth modal (скопировано з index.html) -->
+    <div id="authModal" class="modal-backdrop" style="display: none;">
+      <div class="modal-content">
+        <span class="close-btn" id="closeModal">&times;</span>
+        <h2 id="modalTitle">Реєстрація</h2>
+
+        <div id="messageContainer" style="display: none"></div>
+
+        <form id="registerForm">
+          <label for="reg_username">Ім'я користувача:</label>
+          <input type="text" id="reg_username" name="username" required />
+
+          <label for="reg_email">Email:</label>
+          <input type="email" id="reg_email" name="email" required />
+
+          <label for="reg_password">Пароль:</label>
+          <input type="password" id="reg_password" name="password" required />
+
+          <button type="submit">Зареєструватися</button>
+
+          <p>
+            Вже є акаунт? <a href="#" id="showLogin"><u>Увійти</u></a>
+          </p>
+        </form>
+
+        <form id="loginForm" style="display: none">
+          <label for="log_email">Email:</label>
+          <input type="email" id="log_email" name="email" required />
+
+          <label for="log_password">Пароль:</label>
+          <input type="password" id="log_password" name="password" required />
+
+          <button type="submit">Увійти</button>
+
+          <p>
+            Немає акаунту?
+            <a href="#" id="showRegister"><u>Зареєструватися</u></a>
+          </p>
+        </form>
+      </div>
+    </div>
+    <script src="/js/script.js" type="module"></script>
+  </body>
+</html>

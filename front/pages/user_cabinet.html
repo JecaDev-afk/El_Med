@@ -1,11 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-Med Main page</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      href="/images/favicon_с_фоном_-removebg-preview.png"
+      type="image/x-icon"
+    />
+    <link
+      rel="shortcut icon"
+      href="/images/favicon_с_фоном_-removebg-preview.png"
+      type="image/x-icon"
+    />
+  </head>
+
+  <body>
+    <header>
+      <nav>
+        <a href="/" class="logo">
+          <img src="/images/logo.jpg" alt="Логотип E-Med" />
+          <p>E-Medicine</p>
+        </a>
+        <ul>
+          <li>
+            <a href="/">Головна <span class="emoji">🏠</span></a>
+          </li>
+          <li>
+            <a href="/pages/about.html">Про нас </a
+            ><span class="emoji">🤔</span>
+          </li>
+          <li>
+            <a href="/pages/author.html">Про автора <span class="emoji">👨‍💻</span></a
+            >
+          </li>
+          <li>
+            <a
+              href="/pages/user_cabinet.html"
+              id="userCabinetLink"
+              class="active-link"
+              >Кабінет користувача </a><span class="emoji">🧑‍⚕️</span></a
+            >
+          </li>
+          <li>
+            <div id="authLinks">
+              <button id="openAuthModal">Увійти / Реєстрація 📝</button>
+            </div>
+          </li>
+          <li>
+            <div id="userMenu" style="display: none">
+              <span id="userNameDisplay"></span>
+              <button id="logoutBtn">Вихід</button>
+            </div>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+
+
+
+    <script src="/js/script.js" type="module"></script>
+  </body>
 </html>

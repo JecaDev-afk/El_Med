@@ -1,9 +1,15 @@
-// Функціонал для обробки Реєстрації та Входу
-
+// document.addEventListener("DOMContentLoaded", ...) спрацьовує, коли весь HTML
+// документ повністю завантажено та розібрано.
 document.addEventListener("DOMContentLoaded", () => {
-  // ----------------------------------------------------
-  // 1. Елементи DOM
-  // ----------------------------------------------------
+  // --- КОНФІГУРАЦІЯ ---
+  const API_URL = "http://localhost:3000"; // Адреса вашого бекенд-сервера
+  const REDIRECT_CABINET = "/pages/user_cabinet.html";
+  const REDIRECT_HOME = "/pages/index.html"; // --- ЗМІННІ DOM ---
+
+  const userCabinetLink = document.getElementById("userCabinetLink");
+  const authLinks = document.getElementById("authLinks");
+  const userMenu = document.getElementById("userMenu");
+  const userNameDisplay = document.getElementById("userNameDisplay"); // Примітка: authModal, registerForm, loginForm, messageContainer - ці елементи // повинні бути визначені в HTML-файлі, якщо логіка модального вікна буде використовуватися. // Оскільки їх немає на сторінці about.html, вони можуть бути null.
   const authModal = document.getElementById("authModal");
   const registerForm = document.getElementById("registerForm");
   const loginForm = document.getElementById("loginForm");
@@ -11,35 +17,46 @@ document.addEventListener("DOMContentLoaded", () => {
   const registerLink = document.getElementById("showRegister");
   const loginLink = document.getElementById("showLogin");
   const modalTitle = document.getElementById("modalTitle");
-
-  // Кнопка, яка відкриває модальне вікно (наприклад, "Вхід / Реєстрація")
   const openModalBtn = document.getElementById("openAuthModal");
-
-  // Кнопка закриття (X)
   const closeModalBtn = document.getElementById("closeModal");
+  const logoutBtn = document.getElementById("logoutBtn"); // --- Утилітарні функції (АВТЕНТИФІКАЦІЯ) ---
 
-  // ----------------------------------------------------
-  // 2. Утилітарні функції
-  // ----------------------------------------------------
+  function updateUIVisibility() {
+    const user = localStorage.getItem("user");
 
-  /** Відображає повідомлення користувачеві */
+    if (user) {
+      // Користувач авторизований
+      const userData = JSON.parse(user);
+      if (authLinks) authLinks.style.display = "none";
+      if (userMenu) userMenu.style.display = "block";
+      if (userNameDisplay)
+        userNameDisplay.textContent = `Привіт, ${userData.username}!`;
+      if (userCabinetLink) userCabinetLink.style.display = "block";
+    } else {
+      // Користувач НЕ авторизований
+      if (authLinks) authLinks.style.display = "block";
+      if (userMenu) userMenu.style.display = "none";
+      if (userCabinetLink) userCabinetLink.style.display = "none";
+    }
+  }
+
   function displayMessage(text, isError = false) {
-    messageContainer.textContent = text;
-    messageContainer.className = isError
-      ? "p-2 mt-4 text-red-700 bg-red-100 rounded"
-      : "p-2 mt-4 text-green-700 bg-green-100 rounded";
+    if (!messageContainer) return;
+    messageContainer.textContent = text; // Використовуємо простіші класи, оскільки Tailwind CSS тут не підключено
+    messageContainer.className = isError ? "error-message" : "success-message";
     messageContainer.style.display = "block";
   }
 
-  /** Приховує повідомлення */
   function clearMessage() {
+    if (!messageContainer) return;
     messageContainer.textContent = "";
     messageContainer.style.display = "none";
   }
 
-  /** Перемикає відображення форм */
   function showForm(formType) {
     clearMessage();
+    if (!modalTitle || !registerForm || !loginForm) return;
+
     if (formType === "register") {
       modalTitle.textContent = "Реєстрація";
       registerForm.style.display = "block";
@@ -49,59 +66,42 @@ document.addEventListener("DOMContentLoaded", () => {
       registerForm.style.display = "none";
       loginForm.style.display = "block";
     }
-  }
-
-  // ----------------------------------------------------
-  // 3. Обробники подій для UI
-  // ----------------------------------------------------
-
-  // Відкриття модального вікна
-  openModalBtn.addEventListener("click", () => {
-    authModal.style.display = "flex";
-    // Показуємо форму реєстрації за замовчуванням
-    showForm("register");
-  });
-
-  // Закриття модального вікна
-  closeModalBtn.addEventListener("click", () => {
-    authModal.style.display = "none";
-    clearMessage();
-  });
-
-  // Перемикання на форму входу
-  loginLink.addEventListener("click", (e) => {
-    e.preventDefault();
-    showForm("login");
-  });
-
-  // Перемикання на форму реєстрації
-  registerLink.addEventListener("click", (e) => {
-    e.preventDefault();
-    showForm("register");
-  });
-
-  // Закриття при кліку поза вікном
-  window.addEventListener("click", (event) => {
-    if (event.target === authModal) {
-      authModal.style.display = "none";
-      clearMessage();
-    }
-  });
-
-  // ----------------------------------------------------
-  // 4. Функції API (Реєстрація та Вхід)
-  // ----------------------------------------------------
-
-  /** * Надсилає дані на бек-енд та обробляє відповідь.
-   * @param {string} endpoint - /api/register або /api/login
-   * @param {object} data - Об'єкт з даними форми
-   * @param {HTMLElement} formElement - Елемент форми для очищення
+  }  // --- ЛОГІКА АВТОРИЗАЦІЇ/ВИХОДУ ---
+  /**      * Обробляє вихід із системи
    */
-  async function submitAuth(endpoint, data, formElement) {
+
+  function handleLogout() {
+    localStorage.removeItem("user"); // Перенаправляємо на головну сторінку, якщо знаходимося в кабінеті, // інакше просто оновлюємо UI на поточній сторінці.
+    if (window.location.pathname.includes("user_cabinet.html")) {
+      window.location.href = REDIRECT_HOME;
+    } else {
+      updateUIVisibility();
+    }
+  }
+  /**      * Перевіряє, чи авторизований користувач, і захищає сторінки
+   */
+
+  function checkAuthStatus() {
+    const user = localStorage.getItem("user");
+    const currentPage = window.location.pathname; // Захист сторінки кабінету
+
+    if (currentPage.includes("user_cabinet.html") && !user) {
+      window.location.href = REDIRECT_HOME;
+      return true;
+    }
+    return false;
+  }
+  /**
+   * Обробляє вхід або реєстрацію, спілкуючись з Node.js сервером
+   */
+
+  async function submitAuth(type, data) {
     clearMessage();
+
+    const endpoint = type === "register" ? "/register" : "/login";
 
     try {
-      const response = await fetch(endpoint, {
+      const response = await fetch(`${API_URL}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -111,45 +111,112 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const result = await response.json();
 
-      if (response.ok) {
-        // Успішна відповідь (наприклад, статус 201 або 200)
-        displayMessage(result.message, false);
-        formElement.reset();
-        // Тут можна було б закрити модальне вікно або оновити UI
-        console.log("Дані користувача:", result.user);
-      } else {
-        // Помилка (наприклад, 400, 401, 409)
-        displayMessage(result.message || "Невідома помилка.", true);
-      }
+      if (!response.ok) {
+        throw new Error(
+          result.message || "Сталася невідома помилка на сервері."
+        );
+      } // УСПІХ
+
+      displayMessage(result.message, false); // Зберігаємо дані користувача в пам'яті браузера
+
+      localStorage.setItem("user", JSON.stringify(result.user)); // Перенаправлення
+
+      setTimeout(() => {
+        window.location.href = REDIRECT_CABINET;
+      }, 1000);
     } catch (error) {
-      console.error("Помилка підключення:", error);
-      displayMessage("Помилка підключення до сервера.", true);
+      console.error("Auth Error:", error);
+      displayMessage(error.message, true);
     }
+  } // --- ОБРОБНИКИ ПОДІЙ (АВТЕНТИФІКАЦІЯ) --- // Обробники UI (кнопки, модальне вікно)
+
+  if (openModalBtn) {
+    openModalBtn.addEventListener("click", () => {
+      if (authModal) authModal.style.display = "flex"; // Використовуємо flex, як у CSS
+      showForm("register");
+    });
   }
 
-  // ----------------------------------------------------
-  // 5. Обробка відправки форм
-  // ----------------------------------------------------
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener("click", () => {
+      if (authModal) authModal.style.display = "none";
+      clearMessage();
+    });
+  }
 
-  // Обробка форми РЕЄСТРАЦІЇ
-  registerForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const username = e.target.username.value;
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+  if (loginLink) {
+    loginLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      showForm("login");
+    });
+  }
 
-    submitAuth("/api/register", { username, email, password }, registerForm);
-  });
+  if (registerLink) {
+    registerLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      showForm("register");
+    });
+  } // Вихід (додано обробник)
 
-  // Обробка форми ВХОДУ
-  loginForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", handleLogout);
+  } // Обробка форми РЕЄСТРАЦІЇ
 
-    submitAuth("/api/login", { email, password }, loginForm);
-  });
+  if (registerForm) {
+    registerForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const username = e.target.username.value;
+      const email = e.target.email.value;
+      const password = e.target.password.value;
+      submitAuth("register", { username, email, password });
+    });
+  } // Обробка форми ВХОДУ
 
-  // Показуємо форму реєстрації при першому відкритті (хоча це вже зроблено)
-  // showForm('register');
+  if (loginForm) {
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = e.target.email.value;
+      const password = e.target.password.value;
+      submitAuth("login", { email, password });
+    });
+  } // Закриття модального вікна при кліку поза ним
+
+  window.addEventListener("click", (event) => {
+    if (event.target === authModal) {
+      if (authModal) authModal.style.display = "none";
+      clearMessage();
+    }
+  }); // --- ЛОГІКА АНІМАЦІЇ SCROLL-REVEAL (НОВА) ---
+
+  function setupScrollReveal() {
+    // Створюємо новий Intersection Observer
+    const observer = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          // Якщо елемент увійшов у зону видимості (intersecting)
+          if (entry.isIntersecting) {
+            // Додаємо клас 'active', який запускає CSS-перехід
+            entry.target.classList.add("active"); // Припиняємо спостерігати за цим елементом, щоб анімація спрацювала лише раз
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        // threshold: 0.1 означає, що анімація спрацює, коли 10% елемента буде видимим
+        threshold: 0.1,
+      }
+    ); // Знаходимо всі елементи з класом 'reveal' по всьому документу
+
+    document.querySelectorAll(".reveal").forEach((element) => {
+      // Починаємо спостереження за елементом
+      observer.observe(element);
+    });
+  } // --- ІНІЦІАЛІЗАЦІЯ --- // 1. Перевірка статусу автентифікації та захист сторінок
+
+  if (checkAuthStatus()) {
+    return; // Зупиняємо, якщо перенаправлення відбулося
+  } // 2. Оновлення інтерфейсу користувача (меню)
+  updateUIVisibility(); // 3. Ініціалізація анімації для всіх сторінок, де використовується клас .reveal
+
+  setupScrollReveal();
 });

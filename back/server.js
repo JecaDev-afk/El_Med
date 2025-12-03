@@ -1,45 +1,14 @@
-// back/server.js
 require("dotenv").config();
 const express = require("express");
 const { Pool } = require("pg");
-const bcrypt = require("bcrypt");
-const path = require("path"); // *** ДОДАНО для коректної роботи зі шляхами
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const path = require("path"); // Цей модуль допомагає працювати зі шляхами
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = 3000;
 
-// Middleware для обробки JSON-запитів
-app.use(express.json());
-
-// ===============================================
-// 1. НАЛАШТУВАННЯ СТАТИЧНИХ ФАЙЛІВ ТА КОРЕНЕВОГО МАРШРУТУ
-// ===============================================
-
-// Налаштовуємо обслуговування всіх файлів у папці 'front'
-// __dirname — це поточна директорія ('back'). '..' йде на рівень вище ('El_Med').
-// path.join(__dirname, '..', 'front') формує абсолютний шлях до папки 'front'.
-const staticPath = path.join(__dirname, '..', 'front');
-app.use(express.static(staticPath));
-
-// Маршрут для кореневого шляху "/"
-app.get("/", (req, res) => {
-  // Формуємо абсолютний шлях до index.html
-  const indexPath = path.join(staticPath, 'pages', 'index.html');
-  
-  // Надсилаємо index.html
-  res.sendFile(indexPath, (err) => {
-    if (err) {
-      console.error("Помилка відправки index.html:", err.message);
-      res.status(404).send("Помилка 404: Файл не знайдено.");
-    }
-  });
-});
-
-// ===============================================
-// 2. КОНФІГУРАЦІЯ БАЗИ ДАНИХ (PostgreSQL)
-// ===============================================
-
-// Налаштування пулу з'єднань PostgreSQL
+// Налаштування з'єднання з БД
 const pool = new Pool({
   user: process.env.PG_USER,
   host: process.env.PG_HOST,
@@ -48,113 +17,71 @@ const pool = new Pool({
   port: process.env.PG_PORT,
 });
 
-// ===================================
-// 3. Ендпоінт для РЕЄСТРАЦІЇ
-// ===================================
+app.use(cors());
+app.use(bodyParser.json());
 
-app.post("/api/register", async (req, res) => {
-  const { username, email, password } = req.body;
+// --- ВИПРАВЛЕНА ЧАСТИНА ---
 
-  // 1. Перевірка вхідних даних
-  if (!username || !email || !password) {
-    return res.status(400).json({ message: "Всі поля обов'язкові." });
-  }
+// 1. Вказуємо шлях до папки front (виходимо з 'back' на рівень вгору і йдемо в 'front')
+const frontPath = path.join(__dirname, "../front");
 
-  // 2. Хешування пароля
-  const saltRounds = 10;
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
+// 2. Дозволяємо серверу брати файли (CSS, JS, картинки) з папки front
+app.use(express.static(frontPath));
 
-  // 3. SQL-запит для вставки нового користувача
-  const query = `
-    INSERT INTO users (username, email, password)
-    VALUES ($1, $2, $3)
-    RETURNING id, username, email;
-  `;
-  const values = [username, email, hashedPassword];
-
-  let client;
-  try {
-    client = await pool.connect();
-
-    // Перевірка, чи існує користувач з таким email
-    const userExists = await client.query(
-      "SELECT 1 FROM users WHERE email = $1",
-      [email]
-    );
-    if (userExists.rows.length > 0) {
-      client.release();
-      return res
-        .status(409)
-        .json({ message: "Користувач з таким email вже зареєстрований." });
-    }
-
-    // Вставка нового користувача
-    const result = await client.query(query, values);
-    client.release();
-
-    // Повернення успішного результату (без пароля!)
-    res.status(201).json({
-      message: "Реєстрація успішна!",
-      user: result.rows[0],
-    });
-  } catch (error) {
-    if (client) client.release();
-    console.error("Помилка реєстрації:", error);
-    // Якщо помилка пов'язана з порушенням інших обмежень (наприклад, username UNIQUE), 
-    // PostgreSQL поверне інший код. Залишаємо 500 для загальних помилок.
-    res.status(500).json({ message: "Помилка сервера під час реєстрації." });
-  }
+// 3. Головна сторінка (оскільки index.html у вас лежить глибоко в pages)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(frontPath, "pages", "index.html"));
 });
 
-// ===================================
-// 4. Ендпоінт для ВХОДУ (Приклад)
-// ===================================
+// ---------------------------
 
-app.post("/api/login", async (req, res) => {
-  const { email, password } = req.body;
-  let client;
+// Маршрут: РЕЄСТРАЦІЯ
+app.post("/register", async (req, res) => {
+  const { username, email, password } = req.body;
   try {
-    client = await pool.connect();
-
-    // 1. Знайти користувача за email
-    const result = await client.query("SELECT * FROM users WHERE email = $1", [
+    const userCheck = await pool.query("SELECT * FROM users WHERE email = $1", [
       email,
     ]);
-    client.release();
-
-    const user = result.rows[0];
-
-    if (!user) {
+    if (userCheck.rows.length > 0) {
       return res
-        .status(401)
-        .json({ message: "Неправильний email або пароль." });
+        .status(400)
+        .json({ message: "Користувач з таким email вже існує" });
     }
-
-    // 2. Порівняти хешований пароль
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res
-        .status(401)
-        .json({ message: "Неправильний email або пароль." });
-    }
-
-    // Успішний вхід.
-    // У реальному додатку тут видається JWT токен або створюється сесія.
-    res
-      .status(200)
-      .json({
-        message: "Вхід успішний!",
-        user: { id: user.id, username: user.username, email: user.email },
-      });
-  } catch (error) {
-    if (client) client.release();
-    console.error("Помилка входу:", error);
-    res.status(500).json({ message: "Помилка сервера під час входу." });
+    const newUser = await pool.query(
+      "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email",
+      [username, email, password]
+    );
+    res.json({ message: "Реєстрація успішна!", user: newUser.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Помилка сервера" });
   }
 });
 
-// Запуск сервера
-app.listen(PORT, () => {
-  console.log(`Сервер працює на http://localhost:${PORT}`);
+// Маршрут: ВХІД
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const result = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
+    if (result.rows.length === 0) {
+      return res.status(400).json({ message: "Користувача не знайдено" });
+    }
+    const user = result.rows[0];
+    if (user.password !== password) {
+      return res.status(401).json({ message: "Невірний пароль" });
+    }
+    res.json({
+      message: "Вхід успішний!",
+      user: { id: user.id, username: user.username, email: user.email },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Помилка сервера" });
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Сервер працює на http://localhost:${port}`);
 });
