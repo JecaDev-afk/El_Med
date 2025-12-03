@@ -1,13 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
-/* Базовий скидання та загальні стилі */
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
 
 :root {
   /* --primary-color: #10b981; */
-  --primary-color: linear-gradient(
-    265deg,
-    rgba(83, 189, 113, 1) 25%,
-    rgba(17, 171, 104, 1) 78%
-  );
+  --primary-color: linear-gradient(265deg, rgba(83, 189, 113, 1) 25%, rgba(17, 171, 104, 1) 78%);
   /* Смарагдово-зелений */
   --secondary-color: #1f2937;
   /* Темно-сірий */
@@ -25,9 +20,17 @@
   padding: 0;
 }
 body {
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: var(--light-bg);
   color: var(--secondary-color);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Main should take remaining space so footer sticks to bottom */
+main {
+  flex: 1 0 auto;
 }
 /* ==================================== */
 /* header styles */
@@ -100,8 +103,24 @@ nav img:hover {
   font-weight: 700;
 }
 
+.active-link .emoji {
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: unset;
+  color: inherit;
+  display: inline-block;
+  line-height: 1;
+}
+
+/* Базовий клас для emoji */
+.emoji {
+  display: inline-block;
+  line-height: 1;
+}
+
+#openAuthModal,
 #logoutBtn {
-  padding: 8px 16px;
+  padding: 10px 18px;
   font-size: 14px;
   font-weight: 600;
   color: var(--modal-bg);
@@ -110,17 +129,18 @@ nav img:hover {
   border-radius: 8px;
   cursor: pointer;
   box-shadow: 0 4px 6px -1px var(--shadow-color);
-  transition: background-color 0.3s;
+  transition: background-color 0.18s, transform 0.12s;
 }
 
+#openAuthModal:hover,
 #logoutBtn:hover {
   background: #059669;
-  /* Темніший зелений */
+  transform: translateY(-1px);
 }
 
-/* ==================================== */
+/* =================================================================== */
 /* footer styles */
-/* ==================================== */
+/* =================================================================== */
 
 footer {
   background-color: var(--header-bg);
@@ -145,40 +165,36 @@ footer .footer-contacts p {
   font-size: 14px;
 }
 
-
-/* ==================================== */
+/* =================================================================== */
 /* hero section */
-/* ==================================== */
+/* =================================================================== */
 .hero-section1 {
   /* background: var(--primary-color); */
   background: url(/images/pills-bg-image.jpg);
-  background-size: cover; /* Заполняет блок изображением, обрезая лишнее */
-  background-repeat: no-repeat; /* Предотвращает повторение изображения */
+  background-size: cover;
+  background-repeat: no-repeat;
   background-position: center;
   height: 400px;
   color: white;
   padding: 60px 0;
   text-align: center;
-  font-family: "Nunito";
+  font-family: 'Nunito';
 }
 .hero-section2 {
-  /* background: var(--primary-color); */
   background: url(/images/hero-section-background-2.jpg);
-  background-size: cover; /* Заполняет блок изображением, обрезая лишнее */
-  background-repeat: no-repeat; /* Предотвращает повторение изображения */
+  background-size: cover;
+  background-repeat: no-repeat;
   background-position: center;
   height: 700px;
   color: white;
   padding: 60px 0;
-  /* margin-bottom: 150px; */
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: "lora";
+  font-family: 'lora';
 }
 .hero-section1 h1 {
   font-size: 60px;
-
 }
 .hero-section2 h1 {
   font-size: 150px;
@@ -207,13 +223,9 @@ footer .footer-contacts p {
   transition: transform 0.25s ease, background 0.3s;
 }
 
-/* ==================================== */
 /* ================================================================= */
-/* ==================================== */
 /* main-content */
-/* ==================================== */
 /* ================================================================= */
-/* ==================================== */
 
 .main-content {
   font-family: lora;
@@ -226,7 +238,7 @@ footer .footer-contacts p {
     "about-M-C-p3 about-M-C-p3"; */
 }
 .main-content section {
-  padding: 60PX;
+  padding: 60px;
   border-radius: 10px;
 }
 /* .section table td,
@@ -238,22 +250,13 @@ section table td,
 th {
   text-align: center;
   padding: 10px;
-  /* background: rgba(249, 254, 230, 0.6); */
 }
 .main-content section ul {
-  /* background: rgba(230, 254, 237, 0.6);
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 4px 6px -1px var(--shadow-color); */
   list-style-type: none;
   padding-left: 20px;
   margin-bottom: 10px;
 }
 .main-content section p {
-  /* background: rgba(231, 244, 253, 0.6);
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 4px 6px -1px var(--shadow-color); */
   font-size: 16px;
   line-height: 1.6;
   margin: 30px;
@@ -294,16 +297,15 @@ th {
   align-items: center;
 }
 
-/* ------------------------------------ */
+/* -------------------------------------------------------------- */
 /* 2.1 АНІМАЦІЯ SCROLL-REVEAL */
-/* ------------------------------------ */
+/* -------------------------------------------------------------- */
 .reveal {
   /* Початковий стан: приховано та зміщено вниз */
   opacity: 0;
   transform: translateY(30px);
   /* Плавний перехід */
-  transition: opacity 0.8s ease-out,
-    transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   /* Оптимізація продуктивності для анімації */
   will-change: opacity, transform;
 }
@@ -327,8 +329,9 @@ th {
 .main-content .reveal:nth-child(5) {
   transition-delay: 0.4s;
 }
-
+/* ================================================= */
 /* Стилі для кнопки відкриття */
+/* ================================================= */
 #openAuthModal {
   padding: 12px 24px;
   font-size: 16px;
@@ -353,7 +356,6 @@ th {
 /* ==================================== */
 
 .modal-backdrop {
-  /* Скрываем по умолчанию; показываем через JS (display: 'flex') */
   display: none;
   position: fixed;
   z-index: 1000;
@@ -368,7 +370,6 @@ th {
   overflow: auto;
 }
 
-/* Класс для открытия модального окна через JS */
 .modal-backdrop.is-open {
   display: flex;
 }
@@ -377,8 +378,7 @@ th {
   background-color: var(--modal-bg);
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 10px 15px -3px var(--shadow-color),
-    0 4px 6px -2px var(--shadow-color);
+  box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
   width: 100%;
   max-width: 450px;
   position: relative;
@@ -437,9 +437,9 @@ form label {
   color: var(--secondary-color);
 }
 
-form input[type="text"],
-form input[type="email"],
-form input[type="password"] {
+form input[type='text'],
+form input[type='email'],
+form input[type='password'] {
   width: 100%;
   padding: 12px;
   margin-bottom: 15px;
@@ -457,7 +457,7 @@ form input:focus {
   box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
 }
 
-form button[type="submit"] {
+form button[type='submit'] {
   width: 100%;
   padding: 12px;
   background-color: var(--primary-color);
@@ -472,7 +472,7 @@ form button[type="submit"] {
   transition: background-color 0.3s;
 }
 
-form button[type="submit"]:hover {
+form button[type='submit']:hover {
   background-color: #059669;
 }
 
@@ -515,4 +515,48 @@ form a:hover {
 
 .bg-green-100 {
   background-color: #d1fae5;
+}
+
+/* ======================================================= */
+/* Responsive adjustments */
+/* ======================================================= */
+@media (max-width: 900px) {
+  nav {
+    padding: 8px 20px;
+  }
+  .logo img {
+    height: 56px;
+  }
+  header {
+    height: 96px;
+  }
+  .hero-section1 {
+    height: 320px;
+    padding: 40px 0;
+  }
+  .hero-section2 {
+    height: 420px;
+    padding: 40px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  nav {
+    padding: 8px 12px;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  nav ul {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .hero-section1 h1,
+  .hero-section2 h1 {
+    font-size: 28px;
+  }
+  .hero-button {
+    padding: 14px 28px;
+    font-size: 16px;
+  }
 }
