@@ -1,131 +1,131 @@
 <!DOCTYPE html>
 <html lang="uk">
+ 
+
+<head>
+     
+  <meta charset="UTF-8" />
+     
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     
+  <title>E-Med Appointments</title>
+     
+  <link rel="stylesheet" href="/css/styles.css" />
+     
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+     
+  <link rel="icon" href="/images/favicon_с_фоном_-removebg-preview.png" type="image/x-icon" />
+     
+  <link rel="shortcut icon" href="/images/favicon_с_фоном_-removebg-preview.png" type="image/x-icon" />
    
-  <head>
-       
-    <meta charset="UTF-8" />
-       
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-       
-    <title>E-Med Appointments</title>
-       
-    <link rel="stylesheet" href="/css/styles.css" />
-       
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-       
-    <link
-      rel="icon"
-      href="/images/favicon_с_фоном_-removebg-preview.png"
-      type="image/x-icon"
-    />
-       
-    <link
-      rel="shortcut icon"
-      href="/images/favicon_с_фоном_-removebg-preview.png"
-      type="image/x-icon"
-    />
-     
-  </head>
-   
-  <body>
-       
-    <header>
-           
-      <nav>
+</head>
+ 
+
+<body>
+     
+  <header>
+         
+    <nav>
+             
+      <a href="/" class="logo">
+                  <img src="/images/logo.jpg" alt="Логотип E-Med" />          
+        <p>E-Medicine</p>
                
-        <a href="/" class="logo">
-                    <img src="/images/logo.jpg" alt="Логотип E-Med" />          
-          <p>E-Medicine</p>
-                 
-        </a>
-               
-        <ul>
-                   
-          <li>
-            <a href="/">Головна <span class="emoji">🏠</span></a>
-          </li>
-                   
-          <li>
-            <a href="/pages/about.html">Про нас </a
-            ><span class="emoji">🤔</span>
-          </li>
-                   
-          <li>
-            <a href="/pages/author.html">Про автора </a
-            ><span class="emoji">👨‍💻</span>
-          </li>
-                   
-          <li>
-                       
-            <a href="/pages/user_cabinet.html" id="userCabinetLink"
-              >Кабінет користувача </a
-            ><span class="emoji">🧑‍⚕️</span>          
-          </li>
-                   
-          <li>
-                       
-            <div id="authLinks">
-                           
-              <button id="openAuthModal">Увійти / Реєстрація 📝</button>        
-                 
-            </div>
-                     
-          </li>
-                 
-        </ul>
-             
-      </nav>
-         
-    </header>
+      </a>
+             
+      <ul>
+        <li>
+          <a href="/">Головна <span class="emoji">🏠</span></a>
+        </li>
+        <li>
+          <a href="/pages/about.html">Про нас <span class="emoji">🤔</span></a>
+        </li>
+        <li>
+          <a href="/pages/author.html">Про автора <span class="emoji">👨‍💻</span></a>
+        </li>
+        <li>
+          <a href="/pages/user_cabinet.html" id="userCabinetLink">Кабінет користувача <span
+              class="emoji">🧑‍⚕️</span></a>
+        </li>
+        <li>
+          <div id="authLinks">
+            <button id="openAuthModal" type="button">
+              Увійти / Реєстрація <span class="emoji">📝</span>
+            </button>
+          </div>
+        </li>
+      </ul>
+    </nav>
+       
+  </header>
 
-    <main class="appointment-container">
-      <h2>Запис на прийом 📅</h2>
-      <div
-        id="appointmentMessage"
-        class="message-box"
-        style="display: none"
-      ></div>
+  <main class="appointment-container">
+    <h2>Запис на прийом 📅</h2>
+    <div id="appointmentMessage" class="message-box" style="display: none"></div>
 
-      <form id="appointmentForm" class="appointment-form">
-        <input type="hidden" id="appointment_user_id" name="user_id" />
+    <form id="appointmentForm" class="appointment-form">
+      <input type="hidden" id="appointment_user_id" name="user_id" />
 
-        <label for="doctor_id">Виберіть лікаря:</label>
-        <select id="doctor_id" name="doctor_id" required>
-          <option value="" disabled selected>---</option>
-          <option value="1">Доктор Сміт (Кардіолог)</option>
-          <option value="2">Доктор Джонсон (Терапевт)</option>
-          <option value="3">Доктор Іваненко (Хірург)</option>
-        </select>
+      <label for="doctor_id">Виберіть лікаря:</label>
+      <select id="doctor_id" name="doctor_id" required>
+        <option value="" disabled selected>---</option>
+        <option value="1">Доктор Сміт (Кардіолог)</option>
+        <option value="2">Доктор Джонсон (Терапевт)</option>
+        <option value="3">Доктор Іваненко (Хірург)</option>
+      </select>
 
-        <label for="appointment_date">Дата прийому:</label>
-        <input
-          type="date"
-          id="appointment_date"
-          name="appointment_date"
-          required
-          min="<%= new Date().toISOString().split('T')[0] %>"
-        />
+      <label for="appointment_date">Дата прийому:</label>
+      <input type="date" id="appointment_date" name="appointment_date" required
+        min="<%= new Date().toISOString().split('T')[0] %>" />
 
-        <label for="appointment_time">Час прийому:</label>
-        <input
-          type="time"
-          id="appointment_time"
-          name="appointment_time"
-          required
-        />
+      <label for="appointment_time">Час прийому:</label>
+      <input type="time" id="appointment_time" name="appointment_time" required />
 
-        <label for="reason">Причина візиту (необов'язково):</label>
-        <textarea id="reason" name="reason" rows="4"></textarea>
+      <label for="reason">Причина візиту (необов'язково):</label>
+      <textarea id="reason" name="reason" rows="4"></textarea>
 
-        <button type="submit">Записатися</button>
+      <button type="submit">Записатися</button>
+    </form>
+  </main>
+
+  <!-- МОДАЛЬНЕ ВІКНО -->
+  <div id="authModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="close-btn" id="closeModal" aria-label="Закрити">&times;</button>
+      <h2 id="modalTitle">Реєстрація</h2>
+
+      <div id="messageContainer" style="display: none"></div>
+
+      <form id="registerForm">
+        <label for="reg_username">Ім'я користувача:</label>
+        <input type="text" id="reg_username" name="username" required />
+
+        <label for="reg_email">Email:</label>
+        <input type="email" id="reg_email" name="email" required />
+
+        <label for="reg_password">Пароль:</label>
+        <input type="password" id="reg_password" name="password" required />
+
+        <button type="submit">Зареєструватися</button>
+
+        <p>Вже є акаунт? <a href="#" id="showLogin">Увійти</a></p>
       </form>
-    </main>
 
-       
-    <script src="/js/script.js" type="module"></script>
-     
-  </body>
+      <form id="loginForm" style="display: none">
+        <label for="log_email">Email:</label>
+        <input type="email" id="log_email" name="email" required />
+
+        <label for="log_password">Пароль:</label>
+        <input type="password" id="log_password" name="password" required />
+
+        <button type="submit">Увійти</button>
+
+        <p>Немає акаунту? <a href="#" id="showRegister">Зареєструватися</a></p>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/script.js" type="module"></script>
+</body>
+
 </html>

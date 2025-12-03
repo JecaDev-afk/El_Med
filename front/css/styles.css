@@ -147,7 +147,7 @@ footer {
   text-align: center;
   padding: 20px 0;
   box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-  margin-top: 40px;
+  margin-top: 0;
 }
 footer p {
   color: var(--secondary-color);
@@ -185,8 +185,8 @@ footer .footer-contacts p {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  height: 700px;
-  color: white;
+  height: 500px;
+  color: rgb(255, 255, 255);
   padding: 60px 0;
   display: flex;
   justify-content: center;
@@ -229,39 +229,41 @@ footer .footer-contacts p {
 
 .main-content {
   font-family: lora;
-  /* display: grid;
+  display: grid;
   padding: 20px;
   column-gap: 15px;
   grid-template-areas:
-    "about-M-C-h2 about-M-C-h2"
-    "about-M-C-p1 about-M-C-p2"
-    "about-M-C-p3 about-M-C-p3"; */
+    'about-M-C-h2 about-M-C-h2'
+    'about-M-C-p1 about-M-C-p2'
+    'about-M-C-p3 about-M-C-p3'
+    'about-M-C-h2-2 about-M-C-h2-2'
+    'about-M-C-p4 about-M-C-p4'
+    'about-M-C-p5 about-M-C-p6' ;
+  grid-template-columns: 1fr 1fr;
+  text-align: center;
+  margin: 0 auto;
+  max-width: 100%;
 }
 .main-content section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 60px;
-  border-radius: 10px;
 }
-/* .section table td,
-thead,
-th {
- background: rgba(183, 240, 217, 0.6); 
-} */
-section table td,
-th {
-  text-align: center;
-  padding: 10px;
-}
+
 .main-content section ul {
+  text-align: start;
+  font-size: 23px;
   list-style-type: none;
-  padding-left: 20px;
+  padding-left: 165px;
   margin-bottom: 10px;
 }
 .main-content section p {
-  font-size: 16px;
+  font-size: 23px;
   line-height: 1.6;
-  margin: 30px;
-  max-width: 500px;
-  text-align: center;
+  margin: 20px;
+  max-width: 650px;
+  text-align: start;
 }
 
 .bold-text {
@@ -274,29 +276,63 @@ th {
   text-align: center;
 }
 .about-M-C-h2 {
-  margin: 100px;
+  grid-area: about-M-C-h2;
+  margin: 100px auto 30px auto;
   text-align: center;
   font-size: 42px;
+  padding: 0;
 }
 .about-M-C-p1 {
+  grid-area: about-M-C-p1;
   display: flex;
   flex-direction: column;
   align-items: center;
   grid-area: about-M-C-p1;
   margin-bottom: 15px;
-  text-align: center;
 }
 .about-M-C-p2 {
+  grid-area: about-M-C-p2;
   margin-bottom: 15px;
   text-align: justify;
 }
 .about-M-C-p3 {
+  grid-area: about-M-C-p3;
   margin-bottom: 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-
+.about-M-C-h2-2 {
+  grid-area: about-M-C-h2-2;
+  margin: 100px auto 30px auto;
+  text-align: center;
+  font-size: 42px;
+  padding: 0;
+} 
+.about-M-C-p4 {
+  grid-area: about-M-C-p4;
+  margin-bottom: 15px;
+  text-align: justify;
+}
+.about-M-C-p5 {
+  grid-area: about-M-C-p5;
+  margin-bottom: 15px;
+  text-align: justify;
+}
+.about-M-C-p6 {
+  grid-area: about-M-C-p6;
+  margin-bottom: 15px;
+  text-align: justify;
+}
+table {
+  font-size: 23px;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+main, th, td {
+  padding: 12px 20px;
+  text-align: left;
+}
 /* -------------------------------------------------------------- */
 /* 2.1 АНІМАЦІЯ SCROLL-REVEAL */
 /* -------------------------------------------------------------- */

@@ -1,84 +1,68 @@
 <!DOCTYPE html>
 <html lang="uk">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>E-Med Main page</title>
-    <link rel="stylesheet" href="/css/styles.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="icon"
-      href="/images/favicon_с_фоном_-removebg-preview.png"
-      type="image/x-icon"
-    />
-    <link
-      rel="shortcut icon"
-      href="/images/favicon_с_фоном_-removebg-preview.png"
-      type="image/x-icon"
-    />
-  </head>
 
-  <body>
-    <header>
-      <nav>
-        <a href="/" class="logo">
-          <img src="/images/logo.jpg" alt="Логотип E-Med" />
-          <p>E-Medicine</p>
-        </a>
-        <ul>
-          <li>
-            <a href="/">Головна <span class="emoji">🏠</span></a>
-          </li>
-          <li>
-            <a href="/pages/about.html">Про нас </a
-            ><span class="emoji">🤔</span>
-          </li>
-          <li>
-            <a href="/pages/author.html">Про автора <span class="emoji">👨‍💻</span></a
-            >
-          </li>
-          <li>
-            <a
-              href="/pages/user_cabinet.html"
-              id="userCabinetLink"
-              class="active-link"
-              >Кабінет користувача </a><span class="emoji">🧑‍⚕️</span></a
-            >
-          </li>
-          <li>
-            <div id="authLinks">
-              <button id="openAuthModal">Увійти / Реєстрація 📝</button>
-            </div>
-          </li>
-          <li>
-            <div id="userMenu" style="display: none">
-              <span id="userNameDisplay"></span>
-              <button id="logoutBtn">Вихід</button>
-            </div>
-          </li>
-        </ul>
-      </nav>
-    </header>
-<main>
-  <a href="/pages/appointment.html">Запис на прийом</a>
-</main>
-<section>
-  <h1 id="cabinetWelcome">Вітаємо у Вашому Кабінеті!</h1>
-        <p>Тут ви можете керувати своїми даними та переглядати записи.</p>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-Med Main page</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/images/favicon_с_фоном_-removebg-preview.png" type="image/x-icon" />
+  <link rel="shortcut icon" href="/images/favicon_с_фоном_-removebg-preview.png" type="image/x-icon" />
+</head>
 
-        <section class="appointments-section">
-            <h2>Ваші майбутні записи 📅</h2>
-            <div id="appointmentsList" class="appointments-list">
-                <p>Завантаження ваших записів...</p>
-            </div>
-            <a href="/pages/appointment.html" class="button-primary">Записатися на новий прийом</a>
-        </section>
-</section>
+<body>
+  <header>
+    <nav>
+      <a href="/" class="logo">
+        <img src="/images/logo.jpg" alt="Логотип E-Med" />
+        <p>E-Medicine</p>
+      </a>
+      <ul>
+        <li>
+          <a href="/">Головна <span class="emoji">🏠</span></a>
+        </li>
+        <li><a href="/pages/about.html">Про нас </a><span class="emoji">🤔</span></li>
+        <li>
+          <a href="/pages/author.html">Про автора <span class="emoji">👨‍💻</span></a>
+        </li>
+        <li>
+          <a href="/pages/user_cabinet.html" id="userCabinetLink" class="active-link">Кабінет користувача <span
+              class="emoji">🧑‍⚕️</span></a>
+        </li>
+        <li>
+          <div id="authLinks">
+            <button id="openAuthModal" type="button">
+              Увійти / Реєстрація <span class="emoji">📝</span>
+            </button>
+          </div>
+        </li>
+        <li>
+          <div id="userMenu" style="display: none">
+            <span id="userNameDisplay"></span>
+            <button id="logoutBtn" type="button">Вихід</button>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <a href="/pages/appointment.html">Запис на прийом</a>
+  </main>
+  <section>
+    <h1 id="cabinetWelcome">Вітаємо у Вашому Кабінеті!</h1>
+    <p>Тут ви можете керувати своїми даними та переглядати записи.</p>
 
+    <section class="appointments-section">
+      <h2>Ваші майбутні записи 📅</h2>
+      <div id="appointmentsList" class="appointments-list">
+        <p>Завантаження ваших записів...</p>
+      </div>
+      <a href="/pages/appointment.html" class="button-primary">Записатися на новий прийом</a>
+    </section>
+  </section>
 
-    <script src="/js/script.js" type="module"></script>
-  </body>
+  <script src="/js/script.js" type="module"></script>
+</body>
+
 </html>
