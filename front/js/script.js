@@ -1,6 +1,7 @@
 // document.addEventListener("DOMContentLoaded", ...) спрацьовує, коли весь HTML
 // документ повністю завантажено та розібрано.
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('script.js loaded:', window.location.pathname, ' — DOMContentLoaded');
   // --- КОНФІГУРАЦІЯ ---
   const API_URL = 'http://localhost:3000'; // Адреса вашого бекенд-сервера
   const APPOINTMENT_ENDPOINT = '/api/appointments';
@@ -23,7 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const registerLink = document.getElementById('showRegister');
   const loginLink = document.getElementById('showLogin');
   const modalTitle = document.getElementById('modalTitle');
-  const openModalBtn = document.getElementById('openAuthModal');
+  // Поддерживаем несколько вариантов селекторов: id, класс или data-атрибут
+  const openModalBtns = document.querySelectorAll('#openAuthModal, .openAuth, [data-open-auth]');
+  console.log('openAuth buttons found:', openModalBtns ? openModalBtns.length : 0);
   const closeModalBtn = document.getElementById('closeModal');
   const logoutBtn = document.getElementById('logoutBtn');
 
@@ -342,10 +345,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lastFocusedElement) lastFocusedElement.focus();
   }
 
-  if (openModalBtn) {
-    openModalBtn.addEventListener('click', () => {
-      showForm('login');
-      openAuthModal();
+  if (openModalBtns && openModalBtns.length) {
+    openModalBtns.forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        showForm('login');
+        openAuthModal();
+      });
     });
   }
 
@@ -427,6 +433,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // КНОПКА ПРОКРУТКИ
+
+  // Находим кнопку и элемент, к которому нужно скроллить
+  const backToTopButton = document.querySelector('.back-to-top');
+  const topElement = document.getElementById('top');
+
+  // Проверяем, что элементы найдены
+  if (backToTopButton && topElement) {
+    // Показываем/скрываем кнопку при прокрутке
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > window.innerHeight) {
+        backToTopButton.style.display = 'block';
+      } else {
+        backToTopButton.style.display = 'none';
+      }
+    });
+
+    // Прокручиваем плавно вверх при клике на кнопку
+    backToTopButton.addEventListener('click', e => {
+      e.preventDefault(); // Предотвращаем стандартное поведение ссылки
+      topElement.scrollIntoView({
+        behavior: 'smooth',
+      });
+    });
+  }
+
+  //ЛОГІКА АНІМАЦІЇ TYPE-ANIMATION
+  const text = "E-Med - Здоров'я в один клік.";
+  const out = document.querySelector('.Type-animation-out');
+  let position = 0;
+  let speed = 100;
+
+  function typer() {
+    if (!out) return; // защитный кэйс: если элемент отсутствует — выход
+    if (position < text.length) {
+      out.innerHTML += text.charAt(position);
+      position++;
+      setTimeout(typer, speed);
+    }
+  }
+
+  // Запускаем анимацию только если найден целевой элемент,
+  // чтобы избежать ошибки и прерывания дальнейших скриптов
+  if (out) {
+    out.innerHTML = '';
+    typer();
+  }
   // --- ЛОГІКА АНІМАЦІЇ SCROLL-REVEAL ---
 
   function setupScrollReveal() {

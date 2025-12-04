@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>E-Med Main page</title>
+  <title>E-Med Кабінет користувача</title>
   <link rel="stylesheet" href="/css/styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="icon" href="/images/favicon_с_фоном_-removebg-preview.png" type="image/x-icon" />
@@ -12,6 +12,9 @@
 </head>
 
 <body>
+  <!-- ==================== -->
+  <!-- HEADER -->
+  <!-- ==================== -->
   <header>
     <nav>
       <a href="/" class="logo">
@@ -46,11 +49,14 @@
       </ul>
     </nav>
   </header>
+  <!-- ==================== -->
+  <!-- MAIN -->
+  <!-- ==================== -->
   <main>
     <a href="/pages/appointment.html">Запис на прийом</a>
-  </main>
-  <section>
-    <h1 id="cabinetWelcome">Вітаємо у Вашому Кабінеті!</h1>
+    <section class="hero-section">
+      <h1 id="cabinetWelcome">Вітаємо у Вашому Кабінеті!</h1>
+    </section>
     <p>Тут ви можете керувати своїми даними та переглядати записи.</p>
 
     <section class="appointments-section">
@@ -60,7 +66,7 @@
       </div>
       <a href="/pages/appointment.html" class="button-primary">Записатися на новий прийом</a>
     </section>
-  </section>
+  </main>
 
   <script src="/js/script.js" type="module"></script>
 </body>

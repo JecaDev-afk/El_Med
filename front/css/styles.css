@@ -38,7 +38,7 @@ main {
 header {
   font-size: large;
   font-weight: 600;
-  height: 120px; /* Increased height for better shadow visibility */
+  height: 120px;
   background-color: var(--header-bg);
   /* padding: 20px 40px; */
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
@@ -176,7 +176,7 @@ footer .footer-contacts p {
   background-position: center;
   height: 400px;
   color: white;
-  padding: 60px 0;
+  padding: 30px 0;
   text-align: center;
   font-family: 'Nunito';
 }
@@ -193,10 +193,27 @@ footer .footer-contacts p {
   align-items: center;
   font-family: 'lora';
 }
+.hero-section3 {
+  background: url(/images/hero-section-background-3.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 500px;
+  color: rgb(255, 255, 255);
+  padding: 60px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'lora';
+}
 .hero-section1 h1 {
-  font-size: 60px;
+  font-size: 70px;
 }
 .hero-section2 h1 {
+  font-size: 150px;
+  font-weight: 700;
+}
+.hero-section3 h1 {
   font-size: 150px;
   font-weight: 700;
 }
@@ -206,7 +223,7 @@ footer .footer-contacts p {
   text-decoration: none;
   font-size: 24px;
   background: #82daaa;
-  margin-top: 60px;
+  margin-top: 35px;
   padding: 20px 60px;
   border-radius: 20px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
@@ -329,10 +346,32 @@ table {
   border-collapse: collapse;
   margin-top: 20px;
 }
-main, th, td {
+main th, main td {
   padding: 12px 20px;
   text-align: left;
 }
+/* ============================= */
+/* КНОПКА ПРОКРУТКИ */
+/* ============================= */
+.scroll-up{
+  position: fixed;
+  bottom: 2em;
+  right: 2em;
+  padding: 15px 20px;
+  border-radius: 10px;
+  background: rgb(178, 178, 178);
+  text-decoration: none;
+  font-size: 24px;
+  color: white;
+  display: inline-flex;
+  z-index: 1000;
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
+  animation:cubic-bezier(0.6, -0.28, 0.735, 0.045);
+}
+
+
+
+
 /* -------------------------------------------------------------- */
 /* 2.1 АНІМАЦІЯ SCROLL-REVEAL */
 /* -------------------------------------------------------------- */
@@ -364,6 +403,29 @@ main, th, td {
 }
 .main-content .reveal:nth-child(5) {
   transition-delay: 0.4s;
+}
+
+/* ================================================ */
+/* *TYPE ANIMATION STYLES* */
+/* ================================================ */
+.Type-animation-out {
+font-size: 52px;
+font-weight: 700;
+color: white;
+margin-bottom: 80px;
+}
+
+.Type-animation-out::after {
+content: '|';
+animation: blink 1s infinite;
+}
+@keyframes blink {
+0%, 50% {
+  opacity: 1;
+}
+100% {
+  opacity: 0;
+}
 }
 /* ================================================= */
 /* Стилі для кнопки відкриття */
@@ -554,7 +616,7 @@ form a:hover {
 }
 
 /* ======================================================= */
-/* Responsive adjustments */
+/* АДАПТИВНІСТЬ */
 /* ======================================================= */
 @media (max-width: 900px) {
   nav {
