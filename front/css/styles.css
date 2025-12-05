@@ -206,8 +206,15 @@ footer .footer-contacts p {
   align-items: center;
   font-family: 'lora';
 }
-.hero-section1 h1 {
-  font-size: 70px;
+.hero-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.Type-animation-out1{
+  font-size: 65px;
+  font-weight: 700;
 }
 .hero-section2 h1 {
   font-size: 150px;
@@ -255,7 +262,7 @@ footer .footer-contacts p {
     'about-M-C-p3 about-M-C-p3'
     'about-M-C-h2-2 about-M-C-h2-2'
     'about-M-C-p4 about-M-C-p4'
-    'about-M-C-p5 about-M-C-p6' ;
+    'about-M-C-p5 about-M-C-p6';
   grid-template-columns: 1fr 1fr;
   text-align: center;
   margin: 0 auto;
@@ -325,7 +332,7 @@ footer .footer-contacts p {
   text-align: center;
   font-size: 42px;
   padding: 0;
-} 
+}
 .about-M-C-p4 {
   grid-area: about-M-C-p4;
   margin-bottom: 15px;
@@ -346,14 +353,15 @@ table {
   border-collapse: collapse;
   margin-top: 20px;
 }
-main th, main td {
+main th,
+main td {
   padding: 12px 20px;
   text-align: left;
 }
 /* ============================= */
 /* КНОПКА ПРОКРУТКИ */
 /* ============================= */
-.scroll-up{
+.scroll-up {
   position: fixed;
   bottom: 2em;
   right: 2em;
@@ -366,12 +374,173 @@ main th, main td {
   display: inline-flex;
   z-index: 1000;
   box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
-  animation:cubic-bezier(0.6, -0.28, 0.735, 0.045);
+  animation: cubic-bezier(0.6, -0.28, 0.735, 0.045);
 }
 
+/* =======================AUTHOR===================== */
+.author-section {
+  font-family: 'Nunito', serif;
+  display: grid;
+  grid-template-areas:
+    'author-h2 author-description-right'
+    'author-description-left author-description-right'
+    'author-description-bottom author-description-bottom';
+  grid-template-columns: 1fr 1fr;
+}
+.author-section h2 {
+  grid-area: author-h2;
+  font-size: 43px;
+  margin: 20px;
+  padding: 20px;
+  text-align: center;
+}
+.author-avatar {
+  grid-area: author-avatar;
+  display: block;
+  margin: 20px;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  animation: rotate 20s linear infinite;
+}
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.author-description-left,
+.author-description-right {
+  font-size: 20px;
+  line-height: 1.6;
+  margin: 20px;
+  text-align: start;
+}
+.author-description-left {
+  grid-area: author-description-left;
+}
+section h3 {
+  padding-left: 20px;
+  margin-bottom: 15px;
+  font-size: 30px;
+}
+.author-description-left p,
+.author-description-right p {
+  max-width: 800px;
+  padding-left: 20px;
+  margin-bottom: 15px;
+}
+.author-description-right {
+  grid-area: author-description-right;
+  border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.author-description-bottom {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  grid-area: author-description-bottom;
+  font-size: 20px;
+  line-height: 1.6;
+  margin: 20px;
+  text-align: start;
+}
 
+/* ==================user-cabinet=============== */
+.hero-section4 {
+ background: var(--primary-color); 
+  /* background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center; */
+  height: 200px;
+  font-size: 36px;
+  color: white;
+  font-weight: 700;
+  padding: 30px ;
+  text-align: center;
+  font-family: 'Nunito';
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
+.hero-section4 p {
+  margin-top: 10px;
+  font-size: 24px;
+}
 
+/* Додаємо універсальний клас для приховування вмісту вкладок за замовчуванням */
+.tab-content {
+  background: #efefef;
+  font-family: 'Nunito', serif;
+  display: none; /* Це ключове: приховує вміст, поки JS його не покаже */
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+/* Також додайте стилі для 'tab', 'tablinks' та 'active' з прикладу, 
+   або переконайтеся, що вони у вас є. */
+.tab {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px;
+  justify-content: center;
+  width: 100%;
+}
+
+.tab button {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--modal-bg);
+  background: var(--primary-buttons-color);
+  border: none;
+  /* border-radius: 8px; */
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px var(--shadow-color);
+  transition: background-color 0.3s;
+  margin: 1px 0;
+}
+
+.tab button.active {
+    background-color: #2e8756;
+}
+
+/* =======================make-an-appointment========================= */
+.make-an-appointment-section {
+  background: #efefef;
+  font-family: 'Nunito', serif;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+/* =======================scheduled-appointments-section========================= */
+.scheduled-appointments-section {
+  background: #efefef;
+  font-family: 'Nunito', serif;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+}
+/* =======================appointment-history-section========================= */
+.appointment-history-section {
+  background: #efefef;
+  font-family: 'Nunito', serif;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+}
 /* -------------------------------------------------------------- */
 /* 2.1 АНІМАЦІЯ SCROLL-REVEAL */
 /* -------------------------------------------------------------- */
@@ -409,23 +578,24 @@ main th, main td {
 /* *TYPE ANIMATION STYLES* */
 /* ================================================ */
 .Type-animation-out {
-font-size: 52px;
-font-weight: 700;
-color: white;
-margin-bottom: 80px;
+  font-size: 52px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 80px;
 }
 
 .Type-animation-out::after {
-content: '|';
-animation: blink 1s infinite;
+  content: '|';
+  animation: blink 1s infinite;
 }
 @keyframes blink {
-0%, 50% {
-  opacity: 1;
-}
-100% {
-  opacity: 0;
-}
+  0%,
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 /* ================================================= */
 /* Стилі для кнопки відкриття */

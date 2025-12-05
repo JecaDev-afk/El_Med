@@ -36,7 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const doctorSelect = document.getElementById('doctor_id');
 
   // --- ЗМІННІ DOM (Кабінет користувача, тільки на user_cabinet.html) ---
-  const appointmentsList = document.getElementById('appointmentsList'); // НОВИЙ елемент
+  const appointmentsList = document.getElementById('appointmentsList'); // Заплановані прийоми
+  const appointmentHistoryList = document.getElementById('appointmentHistoryList'); // Історія прийомів
 
   // --- Утилітарні функції (АВТЕНТИФІКАЦІЯ) ---
 
@@ -206,6 +207,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    /* Привітання переноситься у контролер сторінки кабінету користувача */
+
     // ДОДАЄМО user_id до корисного навантаження
     const appointmentPayload = {
       ...data,
@@ -231,9 +234,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
       displayMessage(container, 'Успішно! Запис підтверджено.', false);
 
-      setTimeout(() => {
-        window.location.href = REDIRECT_CABINET;
-      }, 1500);
+      // Після успішного запису оновлюємо список запланованих прийомів
+      loadUserAppointments();
+
+      // Якщо вкладка "Заплановані прийоми" не активна, перемикаємо на неї
+      if (document.getElementById('scheduledAppointments')) {
+        const scheduledButton = document.querySelector(
+          ".tab button[onclick*='scheduledAppointments']"
+        );
+        if (scheduledButton) {
+          scheduledButton.click();
+        }
+      }
     } catch (error) {
       console.error('Помилка відправки запису:', error);
       displayMessage(container, error.message, true);
@@ -251,60 +263,133 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // --- ЛОГІКА ДЛЯ ЗАПЛАНОВАНИХ ПРИЙОМІВ (appointmentsList) ---
+    // Тут потрібен код, який фільтрує лише майбутні прийоми (хоча ваш API може це робити)
     try {
+      // Встановлюємо повідомлення про завантаження
+      appointmentsList.innerHTML = `<p>Завантаження ваших майбутніх записів...</p>`;
+
       // Запит до нового маршруту з ID користувача
       const response = await fetch(
         `${API_URL}${USER_APPOINTMENTS_ENDPOINT}?user_id=${user.user_id}`
       );
-      const appointments = await response.json();
+      const allAppointments = await response.json();
 
       if (!response.ok) {
-        throw new Error(appointments.message || 'Помилка завантаження записів.');
+        throw new Error(allAppointments.message || 'Помилка завантаження записів.');
       }
 
-      if (appointments.length === 0) {
-        appointmentsList.innerHTML = `<p>У вас поки що немає запланованих записів. <a href="/pages/appointment.html">Записатися зараз.</a></p>`;
-        return;
-      }
-
-      let htmlContent = '';
-      appointments.forEach(app => {
-        // Форматуємо дату
-        const date = new Date(app.appointment_date);
-        // Додамо перевірку на валідність дати, щоб уникнути помилок форматування
-        if (isNaN(date)) {
-          console.error('Недійсний формат дати:', app.appointment_date);
-          return; // Пропускаємо недійсний запис
-        }
-
-        const formattedDate = date.toLocaleDateString('uk-UA', {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric',
-        });
-        const formattedTime = date.toLocaleTimeString('uk-UA', {
-          hour: '2-digit',
-          minute: '2-digit',
-        });
-
-        htmlContent += `
-                  <div class="appointment-card">
-                      <h3>👩‍⚕️ ${app.doctor_name} (${app.specialty})</h3>
-                      <p><strong>Дата:</strong> ${formattedDate}</p>
-                      <p><strong>Час:</strong> ${formattedTime}</p>
-                      <p class="reason-text"><strong>Причина:</strong> ${
-                        app.reason || 'Не вказано'
-                      }</p>
-                  </div>
-              `;
+      // Фільтруємо на майбутні записи (якщо API не фільтрує)
+      const now = new Date();
+      const futureAppointments = allAppointments.filter(app => {
+        const appointmentDateTime = new Date(`${app.appointment_date}T${app.appointment_time}`);
+        return appointmentDateTime > now;
       });
 
-      appointmentsList.innerHTML = htmlContent;
+      // Заповнення списку
+      if (futureAppointments.length === 0) {
+        appointmentsList.innerHTML = `<p>У вас поки що немає запланованих записів. <a href="#" onclick="openTab(event, 'makeAppointment')">Записатися зараз.</a></p>`;
+      } else {
+        appointmentsList.innerHTML = formatAppointmentsToHTML(futureAppointments);
+      }
+
+      // --- ЛОГІКА ДЛЯ ІСТОРІЇ ПРИЙОМІВ (appointmentHistoryList) ---
+      if (appointmentHistoryList) {
+        appointmentHistoryList.innerHTML = `<p>Завантаження історії прийомів...</p>`;
+
+        // Фільтруємо на минулі записи
+        const pastAppointments = allAppointments.filter(app => {
+          const appointmentDateTime = new Date(`${app.appointment_date}T${app.appointment_time}`);
+          return appointmentDateTime <= now;
+        });
+
+        if (pastAppointments.length === 0) {
+          appointmentHistoryList.innerHTML = `<p>У вас поки що немає завершених прийомів.</p>`;
+        } else {
+          appointmentHistoryList.innerHTML = formatAppointmentsToHTML(pastAppointments);
+        }
+      }
     } catch (error) {
       console.error('Помилка завантаження записів:', error);
       appointmentsList.innerHTML = `<p class="error-message">Не вдалося завантажити записи: ${error.message}</p>`;
+      if (appointmentHistoryList) {
+        appointmentHistoryList.innerHTML = `<p class="error-message">Не вдалося завантажити історію: ${error.message}</p>`;
+      }
     }
   }
+
+  // Нова функція для форматування HTML-контенту карток прийомів
+  function formatAppointmentsToHTML(appointments) {
+    let htmlContent = '';
+    appointments.forEach(app => {
+      // Якщо у вас окремі поля для дати і часу, об'єднуємо їх для створення об'єкта Date
+      const date = new Date(`${app.appointment_date}T${app.appointment_time}`);
+
+      if (isNaN(date)) {
+        console.error('Недійсний формат дати/часу:', app.appointment_date, app.appointment_time);
+        return;
+      }
+
+      const formattedDate = date.toLocaleDateString('uk-UA', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      });
+      const formattedTime = date.toLocaleTimeString('uk-UA', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+
+      htmlContent += `
+                <div class="appointment-card">
+                    <h3>👩‍⚕️ ${app.doctor_name} (${app.specialty})</h3>
+                    <p><strong>Дата:</strong> ${formattedDate}</p>
+                    <p><strong>Час:</strong> ${formattedTime}</p>
+                    <p class="reason-text"><strong>Причина:</strong> ${
+                      app.reason || 'Не вказано'
+                    }</p>
+                </div>
+            `;
+    });
+    return htmlContent;
+  }
+
+  // --- НОВА ФУНКЦІЯ: ЛОГІКА ТАБІВ У КАБІНЕТІ КОРИСТУВАЧА ---
+  window.openTab = function (evt, tabName) {
+    var i, tabContent, tabLinks;
+
+    // 1. Приховати весь вміст вкладок (використовуємо клас 'tab-content')
+    tabContent = document.getElementsByClassName('tab-content');
+    for (i = 0; i < tabContent.length; i++) {
+      tabContent[i].style.display = 'none';
+    }
+
+    // 2. Видалити клас 'active' з усіх кнопок
+    tabLinks = document.getElementsByClassName('tablinks');
+    for (i = 0; i < tabLinks.length; i++) {
+      tabLinks[i].className = tabLinks[i].className.replace(' active', '');
+    }
+
+    // 3. Показати поточну вкладку і встановити її як активну
+    const currentTabElement = document.getElementById(tabName);
+    if (currentTabElement) {
+      // Для секцій, що містять інші елементи у стовпчик, краще використовувати 'flex'
+      currentTabElement.style.display = 'flex';
+    } else {
+      console.error(`Елемент з ID ${tabName} не знайдено.`);
+    }
+
+    // Встановлюємо активний клас для кнопки, якщо подія передана
+    if (evt && evt.currentTarget) {
+      evt.currentTarget.className += ' active';
+    } else {
+      // Якщо викликано програмно (без події), шукаємо кнопку, щоб її активувати
+      const programmaticButton = document.querySelector(`.tab button[onclick*='${tabName}']`);
+      if (programmaticButton) {
+        programmaticButton.className += ' active';
+      }
+    }
+  };
 
   // --- ОСНОВНИЙ КОНТРОЛЕР ---
 
@@ -321,7 +406,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Викликаємо завантаження записів, якщо ми на сторінці user_cabinet.html
   if (appointmentsList) {
+    // Встановлюємо привітання для користувача
+    const user = getCurrentUser();
+    const cabinetWelcomeElement = document.getElementById('cabinetWelcome');
+    if (cabinetWelcomeElement && user && user.username) {
+      // Використовуємо textContent замість innerHTML, щоб уникнути конфлікту з Type-animation
+      // Але для Type-animation ми вже зарезервували логіку нижче
+      // cabinetWelcomeElement.textContent = `Вітаємо у Вашому Кабінеті, ${user.username}!`;
+    }
+
+    // Запускаємо логіку завантаження записів (як майбутніх, так і історії)
     loadUserAppointments();
+
+    // Встановлюємо вкладку за замовчуванням: "Заплановані прийоми"
+    // Викликаємо openTab програмно, передаючи null замість evt
+    openTab(null, 'scheduledAppointments');
   }
 
   // Обробники UI (кнопки, модальне вікно)
@@ -459,26 +558,49 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  //ЛОГІКА АНІМАЦІЇ TYPE-ANIMATION
-  const text = "E-Med - Здоров'я в один клік.";
-  const out = document.querySelector('.Type-animation-out');
-  let position = 0;
-  let speed = 100;
+  // ЛОГІКА АНІМАЦІЇ TYPE-ANIMATION
+  // Адаптуємо текст для Type-animation-out2, щоб використовувати актуальне ім'я
+  const user = getCurrentUser();
+  const username = user ? user.username : 'Користувач';
 
-  function typer() {
-    if (!out) return; // защитный кэйс: если элемент отсутствует — выход
-    if (position < text.length) {
-      out.innerHTML += text.charAt(position);
+  const text1 = "E-Med - Здоров'я в один клік.";
+  const out1 = document.querySelector('.Type-animation-out1');
+  const text2 = `Вітаємо у Вашому Кабінеті, ${username}!`; // Використовуємо отримане ім'я
+  const out2 = document.querySelector('.Type-animation-out2');
+  let position = 0;
+  let speed1 = 100;
+  let speed2 = 50;
+
+  function typer1() {
+    if (!out1) return; // защитный кэйс: если элемент отсутствует — выход
+    if (position < text1.length) {
+      out1.innerHTML += text1.charAt(position);
       position++;
-      setTimeout(typer, speed);
+      setTimeout(typer1, speed1);
+    }
+  }
+
+  function typer2() {
+    if (!out2) return;
+    if (position < text2.length) {
+      out2.innerHTML += text2.charAt(position);
+      position++;
+      setTimeout(typer2, speed2);
     }
   }
 
   // Запускаем анимацию только если найден целевой элемент,
   // чтобы избежать ошибки и прерывания дальнейших скриптов
-  if (out) {
-    out.innerHTML = '';
-    typer();
+  if (out1) {
+    out1.innerHTML = '';
+    typer1();
+  }
+
+  if (out2 && window.location.pathname.includes('user_cabinet.html')) {
+    // Якщо ми в кабінеті, запускаємо typer2
+    out2.innerHTML = '';
+    position = 0; // Скидаємо позицію для другого тайпера
+    typer2();
   }
   // --- ЛОГІКА АНІМАЦІЇ SCROLL-REVEAL ---
 

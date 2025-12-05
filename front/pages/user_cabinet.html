@@ -53,20 +53,69 @@
   <!-- MAIN -->
   <!-- ==================== -->
   <main>
-    <a href="/pages/appointment.html">Запис на прийом</a>
-    <section class="hero-section">
-      <h1 id="cabinetWelcome">Вітаємо у Вашому Кабінеті!</h1>
+    <section class="hero-section4 ">
+      <section class=" Type-animation-out2">
+        <div id="cabinetWelcome"></div>
+      </section>
+      <!-- <p>Тут ви можете керувати своїми даними та переглядати записи.</p> -->
     </section>
-    <p>Тут ви можете керувати своїми даними та переглядати записи.</p>
+<div class="tab">
+  <button class="tablinks" onclick="openTab(event, 'makeAppointment')">Записатися на новий прийом</button>
+  <button class="tablinks" onclick="openTab(event, 'scheduledAppointments')">Заплановані прийоми</button>
+  <button class="tablinks" onclick="openTab(event, 'appointmentHistory')">Історія прийомів</button>
+</div>
 
-    <section class="appointments-section">
+<section class="scheduled-appointments-section tab-content" id="scheduledAppointments">
       <h2>Ваші майбутні записи 📅</h2>
       <div id="appointmentsList" class="appointments-list">
         <p>Завантаження ваших записів...</p>
       </div>
-      <a href="/pages/appointment.html" class="button-primary">Записатися на новий прийом</a>
-    </section>
+</section>
+
+<section class="appointment-history-section tab-content" id="appointmentHistory">
+      <h2>Історія ваших прийомів 🏥</h2>
+      <div id="appointmentHistoryList" class="appointments-list" >
+        <p>Завантаження історії прийомів...</p>
+      </div>
+</section>
+
+<section class="make-an-appointment-section tab-content" id="makeAppointment">
+      <h2>Запис на прийом 📅</h2>
+      <div id="appointmentMessage" class="message-box" style="display: none"></div>
+      <form id="appointmentForm" class="appointment-form">
+        <input type="hidden" id="appointment_user_id" name="user_id" />
+        <label for="doctor_id">Виберіть лікаря:</label>
+        <select id="doctor_id" name="doctor_id" required>
+          <option value="" disabled selected>---</option>
+          <option value="1">Доктор Сміт (Кардіолог)</option>
+          <option value="2">Доктор Джонсон (Терапевт)</option>
+          <option value="3">Доктор Іваненко (Хірург)</option>
+        </select>
+        <label for="appointment_date">Дата прийому:</label>
+        <input type="date" id="appointment_date" name="appointment_date" required
+          min="<%= new Date().toISOString().split('T')[0] %>" />
+        <label for="appointment_time">Час прийому:</label>
+        <input type="time" id="appointment_time" name="appointment_time" required />
+        <label for="reason">Причина візиту (необов'язково):</label>
+        <textarea id="reason" name="reason" rows="4"></textarea>
+        <button type="submit">Записатися</button>
+      </form>
+</section>
   </main>
+
+  <footer>
+    <p>&copy; 2025 El_Med. Всі права захищені.</p>
+    <p>&copy; 2025 Євгеній Ярещенко.</p>
+    <!-- контакти -->
+    <section class="footer-contacts">
+      <h3>Контакти</h3>
+      <!-- <section class="social-media-link"> -->
+    </section>
+    <p>Email: Evgenijaresenko24@gmail.com</p>
+    <p>Телефон: +380 777 777 7777</p>
+    <p>Адреса: вул. Медична, 10, Черкаси, Україна</p>
+    </section>
+  </footer>
 
   <script src="/js/script.js" type="module"></script>
 </body>
