@@ -1,9 +1,10 @@
-require("dotenv").config();
-const express = require("express");
-const { Pool } = require("pg");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const path = require("path");
+require('dotenv').config();
+const express = require('express');
+const { Pool } = require('pg');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const path = require('path');
+const setupDatabase = require('./db_setup');
 
 const app = express();
 const port = 3000;
@@ -22,11 +23,11 @@ app.use(bodyParser.json());
 
 // --- ОБСЛУГОВУВАННЯ СТАТИЧНИХ ФАЙЛІВ ---
 
-const frontPath = path.join(__dirname, "../front");
+const frontPath = path.join(__dirname, '../front');
 app.use(express.static(frontPath));
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(frontPath, "pages", "index.html"));
+app.get('/', (req, res) => {
+  res.sendFile(path.join(frontPath, 'pages', 'index.html'));
 });
 
 // ------------------------------------
@@ -34,48 +35,43 @@ app.get("/", (req, res) => {
 // ------------------------------------
 
 // Маршрут: РЕЄСТРАЦІЯ (повертає user_id)
-app.post("/register", async (req, res) => {
+app.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
   try {
-    const userCheck = await pool.query("SELECT * FROM users WHERE email = $1", [
-      email,
-    ]);
+    const userCheck = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (userCheck.rows.length > 0) {
-      return res
-        .status(400)
-        .json({ message: "Користувач з таким email вже існує" });
+      return res.status(400).json({ message: 'Користувач з таким email вже існує' });
     }
     const newUser = await pool.query(
-      "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email",
+      'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email',
       [username, email, password]
     );
     const user = newUser.rows[0];
     res.json({
-      message: "Реєстрація успішна!",
+      message: 'Реєстрація успішна!',
       user: { ...user, user_id: user.id },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Помилка сервера" });
+    console.error('Помилка реєстрації:', err);
+    // ВИПРАВЛЕНО: Уточнене повідомлення для 500 Internal Server Error
+    res.status(500).json({ message: 'Помилка сервера при реєстрації користувача.' });
   }
 });
 
 // Маршрут: ВХІД (повертає user_id)
-app.post("/login", async (req, res) => {
+app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
-    const result = await pool.query("SELECT * FROM users WHERE email = $1", [
-      email,
-    ]);
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (result.rows.length === 0) {
-      return res.status(400).json({ message: "Користувача не знайдено" });
+      return res.status(400).json({ message: 'Користувача не знайдено' });
     }
     const user = result.rows[0]; // У реальному проекті тут має бути перевірка хешованого пароля, наприклад, за допомогою bcrypt
     if (user.password !== password) {
-      return res.status(401).json({ message: "Невірний пароль" });
+      return res.status(401).json({ message: 'Невірний пароль' });
     }
     res.json({
-      message: "Вхід успішний!",
+      message: 'Вхід успішний!',
       user: {
         id: user.id,
         username: user.username,
@@ -84,8 +80,9 @@ app.post("/login", async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Помилка сервера" });
+    console.error('Помилка входу:', err);
+    // ВИПРАВЛЕНО: Уточнене повідомлення для 500 Internal Server Error
+    res.status(500).json({ message: 'Помилка сервера при спробі входу.' });
   }
 });
 
@@ -94,86 +91,102 @@ app.post("/login", async (req, res) => {
 // ------------------------------------
 
 // МАРШРУТ 1: ОТРИМАННЯ СПИСКУ ЛІКАРІВ
-app.get("/api/doctors", async (req, res) => {
+app.get('/api/doctors', async (req, res) => {
   try {
-    const doctors = await pool.query(
-      "SELECT id, name, specialty FROM doctors ORDER BY name"
-    );
+    const doctors = await pool.query('SELECT id, name, specialty FROM doctors ORDER BY name');
     res.json(doctors.rows);
   } catch (err) {
-    console.error("Помилка при отриманні списку лікарів:", err);
-    res.status(500).json({ message: "Помилка сервера при отриманні лікарів" });
+    console.error('Помилка при отриманні списку лікарів:', err);
+    res.status(500).json({ message: 'Помилка сервера при отриманні лікарів' });
   }
 });
 
-// МАРШРУТ 2: ЗАПИС НА ПРИЙОМ (Повинна виправити помилку 400)
-app.post("/api/appointments", async (req, res) => {
-  const { user_id, doctor_id, appointment_date, appointment_time, reason } =
-    req.body;
+// МАРШРУТ 2: ЗАПИС НА ПРИЙОМ (ВИПРАВЛЕНО: Використовуємо один combined-рядок дати/часу)
+app.post('/api/appointments', async (req, res) => {
+  // Приймаємо лише appointment_date, оскільки клієнт надсилає повний ISO-рядок в ньому
+  const { user_id, doctor_id, appointment_date, reason } = req.body;
 
-  if (!user_id || !doctor_id || !appointment_date || !appointment_time) {
+  if (!user_id || !doctor_id || !appointment_date) {
+    // Цей код відповідає за 400 Bad Request, який ви бачили, якщо дані неповні
     return res.status(400).json({
-      message: "Будь ласка, заповніть усі необхідні поля (лікар, дата, час).",
+      message: 'Будь ласка, заповніть усі необхідні поля (лікар, дата, час).',
     });
   }
 
   try {
-    const appointmentTimestamp = `${appointment_date} ${appointment_time}`;
+    // appointment_date вже містить повну позначку часу від клієнта (наприклад, "2023-12-06T10:00:00.000Z")
+    const appointmentTimestamp = appointment_date;
 
     const newAppointment = await pool.query(
       `INSERT INTO appointments (user_id, doctor_id, appointment_date, reason) 
-             VALUES ($1, $2, $3, $4) RETURNING *`,
+             VALUES ($1, $2, $3, $4) RETURNING *`,
       [user_id, doctor_id, appointmentTimestamp, reason]
     );
 
     res.json({
-      message: "Запис успішно створено!",
+      message: 'Запис успішно створено!',
       appointment: newAppointment.rows[0],
     });
   } catch (err) {
-    console.error("Помилка при створенні запису:", err);
-    if (err.code === "23503") {
+    console.error('Помилка при створенні запису:', err);
+    if (err.code === '23503') {
+      // Помилка зовнішнього ключа (FK)
       return res.status(400).json({
-        message: "Помилка: неіснуючий лікар або недійсний користувач.",
+        message: 'Помилка: неіснуючий лікар або недійсний користувач.',
       });
     }
-    res.status(500).json({ message: "Помилка сервера при записі на прийом." });
+    // Загальна помилка 500 (Internal Server Error)
+    res.status(500).json({ message: 'Помилка сервера при записі на прийом.' });
   }
 });
 
-// МАРШРУТ 3: ОТРИМАННЯ ЗАПИСІВ КОРИСТУВАЧА (Повинна виправити помилку 404)
-app.get("/api/user/appointments", async (req, res) => {
+// МАРШРУТ 3: ОТРИМАННЯ ЗАПИСІВ КОРИСТУВАЧА (ВИПРАВЛЕНО: Розділяємо TIMESTAMP на дату та час)
+app.get('/api/user/appointments', async (req, res) => {
   const { user_id } = req.query;
 
   if (!user_id) {
-    return res
-      .status(400)
-      .json({ message: "Необхідно вказати ID користувача." });
+    return res.status(400).json({ message: 'Необхідно вказати ID користувача.' });
   }
 
   try {
     const appointments = await pool.query(
       `SELECT 
-                a.id, 
-                a.appointment_date, 
-                a.reason,
-                d.name AS doctor_name, 
-                d.specialty
-             FROM appointments a
-             JOIN doctors d ON a.doctor_id = d.id
-             WHERE a.user_id = $1
-             ORDER BY a.appointment_date DESC`,
+                 a.id, 
+                 -- Розділяємо TIMESTAMP на окремі поля для клієнта
+                 a.appointment_date::date AS appointment_date, 
+                 a.appointment_date::time AS appointment_time, 
+                 a.reason,
+                 d.name AS doctor_name, 
+                 d.specialty
+               FROM appointments a
+               JOIN doctors d ON a.doctor_id = d.id
+               WHERE a.user_id = $1
+               ORDER BY a.appointment_date DESC`,
       [user_id]
     );
 
     res.json(appointments.rows);
   } catch (err) {
-    console.error("Помилка при отриманні записів користувача:", err);
-    res.status(500).json({ message: "Помилка сервера при отриманні записів." });
+    console.error('Помилка при отриманні записів користувача:', err);
+    // Загальна помилка 500
+    res.status(500).json({ message: 'Помилка сервера при отриманні записів.' });
   }
 });
 
 // --- ЗАПУСК СЕРВЕРА: ПОВИНЕН БУТИ ОСТАННІМ ---
-app.listen(port, () => {
-  console.log(`Сервер працює на http://localhost:${port}`);
-});
+async function startServer() {
+  try {
+    // Очікуємо ініціалізацію БД перед запуском сервера
+    await setupDatabase();
+    console.log('Database initialized successfully');
+  } catch (err) {
+    console.error('Failed to initialize database:', err);
+    process.exit(1);
+  }
+
+  app.listen(port, () => {
+    console.log(`Сервер працює на http://localhost:${port}`);
+  });
+}
+
+startServer();

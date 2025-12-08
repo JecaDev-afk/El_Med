@@ -1,5 +1,5 @@
-require("dotenv").config(); // Завантажує змінні з .env
-const { Pool } = require("pg");
+require('dotenv').config(); // Завантажує змінні з .env
+const { Pool } = require('pg');
 
 const pool = new Pool({
   user: process.env.PG_USER,
@@ -37,12 +37,12 @@ CREATE TABLE IF NOT EXISTS appointments (
 );
 `;
   await pool.query(tableCreationQuery);
-  console.log("Tables created successfully.");
+  console.log('Tables created successfully.');
 
   // Додаємо тестових лікарів, якщо їх ще немає
-  const checkDoctors = await pool.query("SELECT COUNT(*) FROM doctors");
+  const checkDoctors = await pool.query('SELECT COUNT(*) FROM doctors');
   if (parseInt(checkDoctors.rows[0].count) === 0) {
-    console.log("Inserting sample doctors...");
+    console.log('Inserting sample doctors...');
     const insertDoctorsQuery = `
 INSERT INTO doctors (name, specialty, phone, email) VALUES 
 ('Доктор Сміт', 'Кардіолог', '1234567890', 'smith@med.com'),
@@ -50,19 +50,25 @@ INSERT INTO doctors (name, specialty, phone, email) VALUES
 ('Доктор Іваненко', 'Хірург', '0011223344', 'ivanenko@med.com');
 `;
     await pool.query(insertDoctorsQuery);
-    console.log("Sample doctors inserted.");
+    console.log('Sample doctors inserted.');
   }
 }
 
-setupDatabase()
-  .then(() => {
-    console.log("Setup finished successfully.");
-  })
-  .catch((err) => {
-    console.error("Error during database setup:", err);
-    process.exit(1);
-  })
-  .finally(() => {
-    console.log("Database setup script has finished execution.");
-    pool.end();
-  });
+// Если скрипт запущен напрямую (не как модуль), выполни setup
+if (require.main === module) {
+  setupDatabase()
+    .then(() => {
+      console.log('Setup finished successfully.');
+    })
+    .catch(err => {
+      console.error('Error during database setup:', err);
+      process.exit(1);
+    })
+    .finally(() => {
+      console.log('Database setup script has finished execution.');
+      pool.end();
+    });
+}
+
+// Экспортируем функцию для использования в server.js
+module.exports = setupDatabase;
