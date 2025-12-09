@@ -259,6 +259,10 @@ footer .footer-contacts p {
   font-size: 65px;
   font-weight: 700;
 }
+.Type-animation-out::before{
+  content: "|";
+}
+
 .hero-section2 h1 {
   font-size: 150px;
   font-weight: 700;
