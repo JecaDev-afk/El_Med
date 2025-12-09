@@ -11,7 +11,7 @@
   <link rel="shortcut icon" href="/images/favicon_с_фоном_-removebg-preview.png" type="image/x-icon" />
 </head>
 
-<body>
+<body id="top">
   <!-- ============================= -->
   <!-- HEADRER -->
   <!-- ============================= -->
@@ -21,7 +21,12 @@
         <img src="/images/logo.jpg" alt="Логотип E-Med" />
         <p>E-Medicine</p>
       </a>
-      <ul>
+      <button class="burger" id="navToggle" aria-label="Меню">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
         <li><a href="/">Головна <span class="emoji">🏠</span></a></li>
         <li><a href="/pages/about.html">Про нас <span class="emoji">🤔</span></a></li>
         <li><a href="/pages/author.html" class="active-link">Про автора <span class="emoji">👨‍💻</span></a></li>
@@ -91,7 +96,7 @@
         </section>
       </section>
     </section>
-    <a href="" class="scroll-up" id="scroll-up">⬆</a>
+    <a href="#top" class="scroll-up" id="scroll-up">⬆</a>
   </main>
   <!-- ==================== -->
   <!-- FOOTER -->

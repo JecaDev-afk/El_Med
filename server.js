@@ -7,23 +7,32 @@ const path = require('path');
 const setupDatabase = require('./db_setup');
 
 const app = express();
-const port = 3000;
+// Хостинг автоматично надасть порт через змінну середовища PORT
+const port = process.env.PORT || 3000;
 
-// Налаштування з'єднання з БД
-const pool = new Pool({
-  user: process.env.PG_USER,
-  host: process.env.PG_HOST,
-  database: process.env.PG_DATABASE,
-  password: process.env.PG_PASSWORD,
-  port: process.env.PG_PORT,
-});
+// --- НАЛАШТУВАННЯ БАЗИ ДАНИХ (ПІДТРИМКА ХОСТИНГУ) ---
+const dbConfig = {
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
+};
+
+// Якщо DATABASE_URL немає (локальний режим), використовуємо дані з .env
+if (!process.env.DATABASE_URL) {
+  dbConfig.user = process.env.PG_USER;
+  dbConfig.host = process.env.PG_HOST;
+  dbConfig.database = process.env.PG_DATABASE;
+  dbConfig.password = process.env.PG_PASSWORD;
+  dbConfig.port = process.env.PG_PORT;
+}
+
+const pool = new Pool(dbConfig);
 
 app.use(cors());
 app.use(bodyParser.json());
 
 // --- ОБСЛУГОВУВАННЯ СТАТИЧНИХ ФАЙЛІВ ---
-
-const frontPath = path.join(__dirname, '../front');
+// Зверніть увагу: шлях змінено, оскільки server.js тепер у корені
+const frontPath = path.join(__dirname, 'front');
 app.use(express.static(frontPath));
 
 app.get('/', (req, res) => {
@@ -34,7 +43,6 @@ app.get('/', (req, res) => {
 // --- МАРШРУТИ АВТЕНТИФІКАЦІЇ ---
 // ------------------------------------
 
-// Маршрут: РЕЄСТРАЦІЯ (повертає user_id)
 app.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
   try {
@@ -53,12 +61,10 @@ app.post('/register', async (req, res) => {
     });
   } catch (err) {
     console.error('Помилка реєстрації:', err);
-    // ВИПРАВЛЕНО: Уточнене повідомлення для 500 Internal Server Error
     res.status(500).json({ message: 'Помилка сервера при реєстрації користувача.' });
   }
 });
 
-// Маршрут: ВХІД (повертає user_id)
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -66,7 +72,7 @@ app.post('/login', async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(400).json({ message: 'Користувача не знайдено' });
     }
-    const user = result.rows[0]; // У реальному проекті тут має бути перевірка хешованого пароля, наприклад, за допомогою bcrypt
+    const user = result.rows[0];
     if (user.password !== password) {
       return res.status(401).json({ message: 'Невірний пароль' });
     }
@@ -81,7 +87,6 @@ app.post('/login', async (req, res) => {
     });
   } catch (err) {
     console.error('Помилка входу:', err);
-    // ВИПРАВЛЕНО: Уточнене повідомлення для 500 Internal Server Error
     res.status(500).json({ message: 'Помилка сервера при спробі входу.' });
   }
 });
@@ -90,7 +95,6 @@ app.post('/login', async (req, res) => {
 // --- МАРШРУТИ API ---
 // ------------------------------------
 
-// МАРШРУТ 1: ОТРИМАННЯ СПИСКУ ЛІКАРІВ
 app.get('/api/doctors', async (req, res) => {
   try {
     const doctors = await pool.query('SELECT id, name, specialty FROM doctors ORDER BY name');
@@ -101,20 +105,16 @@ app.get('/api/doctors', async (req, res) => {
   }
 });
 
-// МАРШРУТ 2: ЗАПИС НА ПРИЙОМ (ВИПРАВЛЕНО: Використовуємо один combined-рядок дати/часу)
 app.post('/api/appointments', async (req, res) => {
-  // Приймаємо лише appointment_date, оскільки клієнт надсилає повний ISO-рядок в ньому
   const { user_id, doctor_id, appointment_date, reason } = req.body;
 
   if (!user_id || !doctor_id || !appointment_date) {
-    // Цей код відповідає за 400 Bad Request, який ви бачили, якщо дані неповні
     return res.status(400).json({
       message: 'Будь ласка, заповніть усі необхідні поля (лікар, дата, час).',
     });
   }
 
   try {
-    // appointment_date вже містить повну позначку часу від клієнта (наприклад, "2023-12-06T10:00:00.000Z")
     const appointmentTimestamp = appointment_date;
 
     const newAppointment = await pool.query(
@@ -130,17 +130,14 @@ app.post('/api/appointments', async (req, res) => {
   } catch (err) {
     console.error('Помилка при створенні запису:', err);
     if (err.code === '23503') {
-      // Помилка зовнішнього ключа (FK)
       return res.status(400).json({
         message: 'Помилка: неіснуючий лікар або недійсний користувач.',
       });
     }
-    // Загальна помилка 500 (Internal Server Error)
     res.status(500).json({ message: 'Помилка сервера при записі на прийом.' });
   }
 });
 
-// МАРШРУТ 3: ОТРИМАННЯ ЗАПИСІВ КОРИСТУВАЧА (ВИПРАВЛЕНО: Розділяємо TIMESTAMP на дату та час)
 app.get('/api/user/appointments', async (req, res) => {
   const { user_id } = req.query;
 
@@ -152,7 +149,6 @@ app.get('/api/user/appointments', async (req, res) => {
     const appointments = await pool.query(
       `SELECT 
                  a.id, 
-                 -- Розділяємо TIMESTAMP на окремі поля для клієнта
                  a.appointment_date::date AS appointment_date, 
                  a.appointment_date::time AS appointment_time, 
                  a.reason,
@@ -168,24 +164,22 @@ app.get('/api/user/appointments', async (req, res) => {
     res.json(appointments.rows);
   } catch (err) {
     console.error('Помилка при отриманні записів користувача:', err);
-    // Загальна помилка 500
     res.status(500).json({ message: 'Помилка сервера при отриманні записів.' });
   }
 });
 
-// --- ЗАПУСК СЕРВЕРА: ПОВИНЕН БУТИ ОСТАННІМ ---
+// --- ЗАПУСК СЕРВЕРА ---
 async function startServer() {
   try {
-    // Очікуємо ініціалізацію БД перед запуском сервера
     await setupDatabase();
     console.log('Database initialized successfully');
   } catch (err) {
     console.error('Failed to initialize database:', err);
-    process.exit(1);
+    // Не виходимо з процесу на хостингу, щоб логи збереглися, але сервер не впав миттєво
   }
 
   app.listen(port, () => {
-    console.log(`Сервер працює на http://localhost:${port}`);
+    console.log(`Сервер працює на порту ${port}`);
   });
 }
 

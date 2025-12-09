@@ -19,6 +19,9 @@
   margin: 0;
   padding: 0;
 }
+html {
+  scroll-behavior: smooth;
+}
 body {
   font-family: 'Inter', sans-serif;
   background-color: var(--light-bg);
@@ -26,6 +29,9 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+}
+.nav-open {
+  overflow: hidden;
 }
 
 /* Main should take remaining space so footer sticks to bottom */
@@ -49,22 +55,23 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 nav ul li {
   display: flex;
   flex-direction: row;
 }
-nav ul {
+.nav-links {
   list-style: none;
   display: flex;
   align-items: center;
   gap: 20px;
 }
-nav ul li a {
+.nav-links li a {
   text-decoration: none;
   color: black;
 }
-nav ul li a:hover {
+.nav-links li a:hover {
   color: rgb(91, 131, 103);
   transition: color 0.3s;
 }
@@ -93,6 +100,42 @@ nav img:hover {
   transform: scale(1.05);
   will-change: transform;
   transition: transform 0.25s ease, box-shadow 0.3s;
+}
+.burger {
+  display: none;
+  width: 42px;
+  height: 36px;
+  padding: 8px;
+  border: 1px solid #dcdcdc;
+  border-radius: 10px;
+  background: var(--modal-bg);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
+}
+.burger span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--secondary-color);
+  border-radius: 999px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.burger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+.burger.is-open span:nth-child(1) {
+  transform: translateY(5px) rotate(45deg);
+}
+.burger.is-open span:nth-child(2) {
+  opacity: 0;
+}
+.burger.is-open span:nth-child(3) {
+  transform: translateY(-5px) rotate(-45deg);
 }
 
 .active-link {
@@ -558,6 +601,18 @@ section h3 {
   align-items: center;
   padding: 40px 20px;
 }
+
+/* Базове покращення для форм/табів */
+.appointment-form,
+.tab-content form {
+  width: 100%;
+  max-width: 720px;
+}
+
+.appointments-list {
+  width: 100%;
+  max-width: 900px;
+}
 /* -------------------------------------------------------------- */
 /* 2.1 АНІМАЦІЯ SCROLL-REVEAL */
 /* -------------------------------------------------------------- */
@@ -805,50 +860,285 @@ form a:hover {
 /* ======================================================= */
 /* АДАПТИВНІСТЬ */
 /* ======================================================= */
-@media (max-width: 900px) {
+@media (max-width: 1200px) {
   nav {
-    padding: 8px 20px;
+    padding: 10px 24px;
+    gap: 10px;
   }
   .logo img {
-    height: 56px;
-  }
-  header {
-    height: 96px;
+    height: 64px;
   }
   .hero-section1 {
-    height: 320px;
+    height: 360px;
     padding: 40px 0;
   }
-  .hero-section2 {
-    height: 420px;
-    padding: 40px 0;
+  .hero-section2,
+  .hero-section3 {
+    height: 440px;
+    padding: 46px 0;
+  }
+  .hero-section2 h1,
+  .hero-section3 h1 {
+    font-size: 110px;
+  }
+  .Type-animation-out1 {
+    font-size: 52px;
+  }
+  .main-content section {
+    padding: 44px;
+  }
+  .main-content section p {
+    font-size: 21px;
+    padding: 0 6px;
+  }
+  .main-content section ul {
+    padding-left: 80px;
+    font-size: 21px;
   }
 }
 
-@media (max-width: 1171px){
-  nav{
-    gap: 10px;
-    font-size: 15px;
+@media (max-width: 992px) {
+  header {
+    height: auto;
+  }
+  nav {
+    padding: 10px 18px;
+  }
+  .logo {
+    font-size: 20px;
+  }
+  .logo img {
+    height: 58px;
+  }
+  .hero-section1 {
+    height: 320px;
+  }
+  .hero-section2,
+  .hero-section3 {
+    height: 400px;
+  }
+  .hero-section2 h1,
+  .hero-section3 h1 {
+    font-size: 80px;
+  }
+  .Type-animation-out1 {
+    font-size: 44px;
+  }
+  .main-content {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'about-M-C-h2'
+      'about-M-C-p1'
+      'about-M-C-p2'
+      'about-M-C-p3'
+      'about-M-C-h2-2'
+      'about-M-C-p4'
+      'about-M-C-p5'
+      'about-M-C-p6';
+    row-gap: 12px;
+  }
+  .main-content section {
+    padding: 30px 22px;
+  }
+  .main-content section p {
+    font-size: 19px;
+    line-height: 1.55;
+    margin: 12px 0;
+    max-width: 100%;
+  }
+  .main-content section ul {
+    padding-left: 24px;
+    font-size: 19px;
+  }
+  .about-M-C-h2,
+  .about-M-C-h2-2 {
+    margin: 50px auto 18px auto;
+    font-size: 34px;
+  }
+  table {
+    font-size: 18px;
+    width: 100%;
+    display: block;
+    overflow-x: auto;
+  }
+  table tr {
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 10px;
+    border-bottom: 1px solid #d9d9d9;
+    padding: 10px 0;
+  }
+  main th,
+  main td {
+    padding: 10px 12px;
+  }
+  .author-section {
+    grid-template-areas:
+      'author-h2'
+      'author-description-right'
+      'author-description-left'
+      'author-description-bottom';
+    grid-template-columns: 1fr;
+  }
+  .author-section h2 {
+    font-size: 36px;
+    padding: 10px;
+  }
+  .author-description-left,
+  .author-description-right,
+  .author-description-bottom {
+    margin: 10px 16px;
+  }
+  .author-description-left p,
+  .author-description-right p {
+    padding-left: 0;
+  }
+  .author-avatar {
+    width: 360px;
+    height: 360px;
+  }
+  .tab {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  nav {
+    padding: 10px 14px;
+  }
+  .burger {
+    display: inline-flex;
+  }
+  .nav-links {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--header-bg);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+    border-radius: 0 0 12px 12px;
+    display: none;
+    z-index: 999;
+  }
+  .nav-links.is-open {
+    display: flex;
+  }
+  .hero-section1 {
+    height: 280px;
+  }
+  .hero-section1 h1,
+  .hero-section2 h1,
+  .hero-section3 h1 {
+    font-size: 46px;
+  }
+  .Type-animation-out1 {
+    font-size: 36px;
+  }
+  .hero-button {
+    padding: 14px 30px;
+    font-size: 18px;
+  }
+  .main-content section {
+    padding: 26px 14px;
+  }
+  .main-content section p,
+  .main-content section ul {
+    font-size: 18px;
+  }
+  section h3 {
+    font-size: 26px;
+    padding-left: 0;
+  }
+  .author-avatar {
+    width: 260px;
+    height: 260px;
+  }
+  .tab {
+    grid-template-columns: 1fr;
+  }
+  .tab button {
+    width: 100%;
+  }
+  .tab-content,
+  .make-an-appointment-section,
+  .scheduled-appointments-section,
+  .appointment-history-section {
+    padding: 28px 14px;
+  }
+  .hero-section4 {
+    font-size: 26px;
+    padding: 24px 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  nav {
+    padding: 10px 12px;
+  }
+  .logo img {
+    height: 52px;
+  }
+  .logo {
+    font-size: 18px;
+  }
+  .hero-section1 {
+    height: 240px;
+  }
+  .hero-button {
+    padding: 12px 24px;
+    font-size: 16px;
+  }
+  .main-content section {
+    padding: 20px 12px;
+  }
+  .about-M-C-h2,
+  .about-M-C-h2-2 {
+    font-size: 30px;
+  }
+  table tr {
+    padding: 6px 0;
+  }
+  .scroll-up {
+    right: 1em;
+  }
+  .modal-content {
+    padding: 22px 18px;
   }
 }
 
 @media (max-width: 480px) {
-  nav {
-    padding: 8px 12px;
-    flex-direction: column;
-    gap: 8px;
-    align-items: flex-start;
-  }
   nav ul {
-    flex-wrap: wrap;
     gap: 8px;
+  }
+  #openAuthModal,
+  #logoutBtn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
   }
   .hero-section1 h1,
   .hero-section2 h1 {
-    font-size: 28px;
+    font-size: 52px;
+  }
+  .Type-animation-out1 {
+    font-size: 30px;
   }
   .hero-button {
-    padding: 14px 28px;
+    padding: 12px 22px;
+    font-size: 15px;
+  }
+  .author-avatar {
+    width: 220px;
+    height: 220px;
+  }
+  .footer-contacts h3 {
     font-size: 16px;
+  }
+  .footer-contacts p {
+    font-size: 13px;
   }
 }

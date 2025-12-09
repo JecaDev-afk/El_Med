@@ -1,9 +1,9 @@
-// document.addEventListener("DOMContentLoaded", ...) спрацьовує, коли весь HTML
-// документ повністю завантажено та розібрано.
 document.addEventListener('DOMContentLoaded', () => {
   console.log('script.js loaded:', window.location.pathname, ' — DOMContentLoaded');
-  // --- КОНФІГУРАЦІЯ ---
-  const API_URL = 'http://localhost:3000'; // Адреса вашого бекенд-сервера
+
+  // --- КОНФІГУРАЦІЯ ДЛЯ ХОСТИНГУ ---
+  const API_URL = ''; // <-- ВАЖЛИВО: Залишаємо пустим для продакшену
+
   const APPOINTMENT_ENDPOINT = '/api/appointments';
   const DOCTORS_ENDPOINT = '/api/doctors';
   const USER_APPOINTMENTS_ENDPOINT = '/api/user/appointments';
@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const authLinks = document.getElementById('authLinks');
   const userMenu = document.getElementById('userMenu');
   const userNameDisplay = document.getElementById('userNameDisplay');
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
   const authModal = document.getElementById('authModal');
   const registerForm = document.getElementById('registerForm');
   const loginForm = document.getElementById('loginForm');
@@ -34,13 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const doctorSelect = document.getElementById('doctor_id');
   const appointmentsList = document.getElementById('appointmentsList');
   const appointmentHistoryList = document.getElementById('appointmentHistoryList');
+  const scrollUpBtn = document.getElementById('scroll-up');
 
   // --- ЛОГІКА АНІМАЦІЇ (SCROLL REVEAL) ---
-  // Виносимо це в окрему функцію, щоб викликати її після завантаження даних
   function initScrollAnimations() {
     const reveals = document.querySelectorAll('.reveal');
-
-    // Якщо елементів немає, виходимо
     if (reveals.length === 0) return;
 
     const observer = new IntersectionObserver(
@@ -52,14 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
       },
-      {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px', // Активувати трохи раніше
-      }
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
     );
 
     reveals.forEach(element => {
-      // Спостерігаємо тільки за тими, хто ще не активний
       if (!element.classList.contains('active')) {
         observer.observe(element);
       }
@@ -67,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- Утилітарні функції ---
-
   function getCurrentUser() {
     const userJson = localStorage.getItem('user');
     try {
@@ -127,23 +122,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- ДОПОМІЖНА ФУНКЦІЯ ДАТИ ---
-  // Створює точний Date об'єкт, об'єднуючи дату з об'єкта та час з рядка
   function parseAppointmentDate(dateISOString, timeString) {
     try {
-      // 1. Беремо дату з ISO рядка (який може бути UTC)
       const dateObj = new Date(dateISOString);
       if (isNaN(dateObj)) return null;
 
-      // 2. Отримуємо компоненти дати (Рік, Місяць, День) у локальному контексті
       const year = dateObj.getFullYear();
       const month = String(dateObj.getMonth() + 1).padStart(2, '0');
       const day = String(dateObj.getDate()).padStart(2, '0');
-
-      // 3. Формуємо рядок "YYYY-MM-DD HH:MM:SS"
-      // timeString зазвичай "HH:MM:SS"
       const fullString = `${year}-${month}-${day} ${timeString}`;
-
-      // 4. Створюємо новий Date, який браузер сприйме як локальний
       return new Date(fullString);
     } catch (e) {
       console.error('Помилка парсингу дати:', e);
@@ -152,7 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- ЛОГІКА АВТОРИЗАЦІЇ ---
-
   function handleLogout() {
     localStorage.removeItem('user');
     if (window.location.pathname.includes('user_cabinet.html')) {
@@ -226,7 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // 1. Формуємо локальний рядок часу
     const localDateTimeString = `${data.appointment_date} ${data.appointment_time}:00`;
     const localDate = new Date(localDateTimeString);
 
@@ -235,7 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // 2. Конвертуємо в UTC для бекенду
     const appointmentPayload = {
       doctor_id: data.doctor_id,
       appointment_date: localDate.toISOString(),
@@ -272,9 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusClass = isHistory ? 'status-completed' : 'status-scheduled';
 
     appointments.forEach(app => {
-      // Використовуємо надійну функцію парсингу
       const date = parseAppointmentDate(app.appointment_date, app.appointment_time);
-
       if (!date) return;
 
       const formattedDate = date.toLocaleDateString('uk-UA', {
@@ -284,7 +266,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       const formattedTime = app.appointment_time.substring(0, 5);
 
-      // Додаємо картку. Клас reveal робить її спочатку невидимою.
       htmlContent += `
           <div class="appointment-card reveal">
               <div class="card-header">
@@ -319,7 +300,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const pastAppointments = [];
 
       allAppointments.forEach(app => {
-        // Парсимо дату надійно
         const appointmentDateTime = parseAppointmentDate(
           app.appointment_date,
           app.appointment_time
@@ -334,11 +314,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      // Сортування (використовуємо вже розпарсену дату)
       futureAppointments.sort((a, b) => a._parsedDate - b._parsedDate);
       pastAppointments.sort((a, b) => b._parsedDate - a._parsedDate);
 
-      // Відображення
       if (futureAppointments.length === 0) {
         appointmentsList.innerHTML = `<p>У вас поки що немає запланованих записів. <a href="#" onclick="window.openTab(event, 'makeAppointment')">Записатися зараз.</a></p>`;
       } else {
@@ -352,9 +330,6 @@ document.addEventListener('DOMContentLoaded', () => {
           appointmentHistoryList.innerHTML = formatAppointmentsToHTML(pastAppointments, true);
         }
       }
-      // SCROLL-BUTTON
-      // --- КЛЮЧОВЕ ВИПРАВЛЕННЯ ВИДИМОСТІ ---
-      // Запускаємо анімацію ПІСЛЯ того, як HTML було додано на сторінку
       setTimeout(initScrollAnimations, 100);
     } catch (error) {
       console.error(error);
@@ -384,17 +359,41 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // --- ІНІЦІАЛІЗАЦІЯ ---
-
-  // SCROLL-BUTTON LOGIC (Винесено за межі loadUserAppointments)
   function scrollUp() {
-    const scrollUpBtn = document.getElementById('scroll-up');
     if (scrollUpBtn) {
       window.scrollY >= 350
-        ? scrollUpBtn.classList.add("show-scroll")
-        : scrollUpBtn.classList.remove("show-scroll");
+        ? scrollUpBtn.classList.add('show-scroll')
+        : scrollUpBtn.classList.remove('show-scroll');
     }
   }
-  window.addEventListener("scroll", scrollUp);
+  window.addEventListener('scroll', scrollUp);
+  if (scrollUpBtn) {
+    scrollUpBtn.addEventListener('click', e => {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  function closeNavMenu() {
+    if (navLinks) navLinks.classList.remove('is-open');
+    if (navToggle) navToggle.classList.remove('is-open');
+    document.body.classList.remove('nav-open');
+  }
+  if (navToggle && navLinks) {
+    navToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('is-open');
+      navToggle.classList.toggle('is-open');
+      document.body.classList.toggle('nav-open');
+    });
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) closeNavMenu();
+      });
+    });
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) closeNavMenu();
+    });
+  }
 
   if (checkAuthStatus()) return;
   updateUIVisibility();
@@ -406,7 +405,6 @@ document.addEventListener('DOMContentLoaded', () => {
     openTab(null, 'scheduledAppointments');
   }
 
-  // Модальні вікна
   let lastFocusedElement = null;
   function openAuthModal() {
     if (!authModal) return;
@@ -473,7 +471,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (event.target === authModal) closeAuthModal();
   });
 
-  // Анімації тексту
   const user = getCurrentUser();
   const username = user ? user.username : 'Користувач';
   const out1 = document.querySelector('.Type-animation-out1');
@@ -498,6 +495,5 @@ document.addEventListener('DOMContentLoaded', () => {
     typeText(out2, `Вітаємо у Вашому Кабінеті, ${username}!`, 50);
   }
 
-  // Запуск ScrollReveal для статичних елементів
   initScrollAnimations();
 });
